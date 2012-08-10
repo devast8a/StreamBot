@@ -12,8 +12,8 @@ namespace StreamBot
             }
             catch (Exception e)
             {
-                IRCBot.Log.AddErrorMessage(e.Message);
+                IRCBot.Log.AddErrorMessage(e.Message);  
             }
-		}
+        }
 	}
 }
