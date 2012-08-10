@@ -7,10 +7,12 @@ namespace StreamBot.IRCBot
     public class Log
     {
         public static string filename;
+        public static int maxlen;
 
-        public static void StartLogging(string filename)
+        public static void StartLogging(string filename, int maxlen)
         {
             Log.filename = filename;
+            Log.maxlen = maxlen;
             if (File.Exists(filename))
                 File.Delete(filename);
         }
@@ -31,7 +33,6 @@ namespace StreamBot.IRCBot
 
         private static void CleanFile()
         {
-            int maxlen = 500;
             int len = File.ReadAllLines(filename).Length;
             if (len > maxlen)
                 File.WriteAllLines(filename, File.ReadAllLines(filename).Skip(len - maxlen).ToArray());
