@@ -11,7 +11,12 @@ namespace StreamBot.IRCBot.Sites
             HtmlDocument doc = web.Load(link);
 
             if (doc.DocumentNode.SelectSingleNode("//span[@id='isLive']").InnerText == "true")
+            {
+                Log.AddMessage("Stream " + link + " found online!");
                 return true;
+            }
+
+            Log.AddMessage("Stream " + link + " found offline.");
 
             return false;
         }

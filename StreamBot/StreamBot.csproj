@@ -50,6 +50,7 @@
     <Compile Include="IRCBot\Commands.cs" />
     <Compile Include="IRCBot\Sites\Twitch.cs" />
     <Compile Include="IRCBot\Sites\Owned.cs" />
+    <Compile Include="IRCBot\Log.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

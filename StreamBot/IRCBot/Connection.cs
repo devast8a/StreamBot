@@ -82,7 +82,7 @@ namespace StreamBot.IRCBot
             string[] ex;
             string data;
 
-            var newStreamTimer = new Timer(streamTimer, null, TimeSpan.Zero, TimeSpan.FromMinutes(2));
+            var newStreamTimer = new Timer(streamTimer, null, TimeSpan.Zero, TimeSpan.FromMinutes(3));
 
             running = true;
             while (running)

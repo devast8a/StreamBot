@@ -34,11 +34,15 @@ namespace StreamBot.IRCBot
             Regex owned      = new Regex(@"^.*own3d\.tv.+$");
      
 			List<Stream> tempStreams = new List<Stream>();
+            Log.AddMessage("Checking streams.");
+            Log.AddMessage("Streams to check: " + StreamList.Count + ".");
 
             foreach (var stream in StreamList)
             {
                 string link = stream.URL;
                 bool status = false;
+
+                Log.AddMessage("Checking stream " + link + "...");
 
                 if (livestream.IsMatch(link))
                     status = Sites.Livestream.GetStatus(link);
@@ -63,6 +67,8 @@ namespace StreamBot.IRCBot
                     stream.Subject = String.Empty;
                 }
             }
+
+            Log.AddMessage("Stream checking done.");
 
 			OnlineStreams.Clear();
 			OnlineStreams.AddRange(tempStreams);
