@@ -9,7 +9,7 @@ namespace StreamBot.IRCBot
             Settings.LoadConfig();
             Settings.LoadStreams();
             Settings.LoadOps();
-            Log.StartLogging("streambot.log", 500);
+            Log.StartLogging("streambot.log", 1000);
             Connection.Create();
         }
     }

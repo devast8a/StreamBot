@@ -2,18 +2,18 @@ using System;
 
 namespace StreamBot
 {
-	class MainClass
-	{
-        	public static void Main(string[] args)
+    class MainClass
+    {
+        public static void Main(string[] args)
+        {
+            try
+            {
+            	IRCBot.Bot.Start();
+	        }
+        	catch (Exception e)
         	{
-            		try
-            		{
-                		IRCBot.Bot.Start();
-	        	}
-        	    	catch (Exception e)
-        	    	{
-               	 		IRCBot.Log.AddErrorMessage(e.Message);  
-            		}
-        	}
+            	IRCBot.Log.AddErrorMessage(e.Message);  
+            }
+        }
 	}
 }

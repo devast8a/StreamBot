@@ -8,15 +8,22 @@ namespace StreamBot.IRCBot.Sites
         public static bool GetStatus(string link)
         {
             HtmlWeb web = new HtmlWeb();
-            HtmlDocument doc = web.Load(link);
 
-            if (doc.DocumentNode.SelectSingleNode("//span[@id='isLive']").InnerText == "true")
+            try
             {
-                Log.AddMessage("Stream " + link + " found online!");
-                return true;
-            }
+                HtmlDocument doc = web.Load(link);
+                if (doc.DocumentNode.SelectSingleNode("//span[@id='isLive']").InnerText == "true")
+                {
+                    Log.AddMessage("Stream " + link + " found online!");
+                    return true;
+                }
 
-            Log.AddMessage("Stream " + link + " found offline.");
+                Log.AddMessage("Stream " + link + " found offline.");
+            }
+            catch (Exception e)
+            {
+                Log.AddErrorMessage(e.Message);
+            }
 
             return false;
         }
