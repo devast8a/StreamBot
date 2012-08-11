@@ -15,5 +15,5 @@ namespace StreamBot
             	IRCBot.Log.AddErrorMessage(e.Message);  
             }
         }
-	}
+    }
 }
