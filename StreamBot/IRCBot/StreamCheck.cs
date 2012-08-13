@@ -22,7 +22,7 @@ namespace StreamBot.IRCBot
             return StreamList.Any(stream => stream.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
         }
 
-        public static string[] UpdateStreams()
+        public static UpdateStreamResult UpdateStreams()
         {
             List<Stream> tempStreams = new List<Stream>();
             Log.AddMessage("Checking streams.");
@@ -110,12 +110,10 @@ namespace StreamBot.IRCBot
                         topic = String.Empty;
                 }
 
-                string[] rtn = new string[] {msg, topic};
-                return rtn;
+                return new UpdateStreamResult(topic, msg);
             }
 
-            string[] nothing = new string[] {String.Empty, "No streams are currently online."};
-            return nothing;
+            return new UpdateStreamResult(String.Empty, "No streams are currently online.");
         }
 
         public static string GetOnlineStreams()

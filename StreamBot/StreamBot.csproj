@@ -46,6 +46,7 @@
     <Compile Include="IRCBot\Sites\IStreamSite.cs" />
     <Compile Include="IRCBot\Sites\SiteProvider.cs" />
     <Compile Include="IRCBot\Sites\UnsupportedSiteException.cs" />
+    <Compile Include="IRCBot\UpdateStreamResult.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="IRCBot\Connection.cs" />

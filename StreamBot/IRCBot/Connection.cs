@@ -81,27 +81,27 @@ namespace StreamBot.IRCBot
         private static string prevtopic = "null";
         private static void streamTimer(object sender)
         {
-            string[] msg = StreamCheck.UpdateStreams();
-            if (msg [0] != String.Empty)
+            UpdateStreamResult res = StreamCheck.UpdateStreams();
+            if (!String.IsNullOrWhiteSpace(res.Message))
             {
                 foreach (var channel in Settings.Channels)
                 {
-                    irc.SendMessage(SendType.Message, channel, msg [0]);
+                    irc.SendMessage(SendType.Message, channel, res.Message);
                 }
             }
 
             if (prevtopic == "null")
                 Thread.Sleep(TimeSpan.FromSeconds(30));
 
-            if (msg [1] != String.Empty && msg[1] != prevtopic)
+            if (!String.IsNullOrWhiteSpace(res.Topic) && res.Topic != prevtopic)
             {
                 foreach (var channel in Settings.PrimaryChannels)
                 {
-                    irc.RfcTopic(channel, msg[1]);
+                    irc.RfcTopic(channel, res.Topic);
                 }
             }
 
-            prevtopic = msg[1];
+            prevtopic = res.Topic;
         }
     }
 }
