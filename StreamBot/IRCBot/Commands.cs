@@ -38,9 +38,8 @@ namespace StreamBot.IRCBot
                         {
                             message += "Status: Offline";
                         }
-                        rtn += message;
 
-                        return rtn;
+                        rtn += message;
                     } 
                     else
                     {
@@ -53,7 +52,7 @@ namespace StreamBot.IRCBot
 
             if (command.Trim() == "!streams")
             {
-                rtn += sender + ": " + StreamCheck.GetOnlineStreams();
+                rtn += StreamCheck.GetOnlineStreams();
                 return rtn;
             }
 
@@ -71,6 +70,8 @@ namespace StreamBot.IRCBot
             {
                 rtn += "A step by step guide on how to set up your own stream can be found here: " +
                           "http://vidyadev.com/wiki/A_guide_to_streaming";
+
+                return rtn;
             }
 
             if (command.Trim() == "!operators")
@@ -79,6 +80,8 @@ namespace StreamBot.IRCBot
                 foreach (var op in Settings.Operators)
                     rtn += op + ", ";
                 rtn = rtn.Remove(rtn.Length - 2, 2) + ".";
+
+                return rtn;
             }
                   
             if (command.Trim() == "!streamers" && StreamCheck.StreamList.Any())
