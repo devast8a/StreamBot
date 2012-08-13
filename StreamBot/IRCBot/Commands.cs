@@ -156,52 +156,52 @@ namespace StreamBot.IRCBot
                 }
             }
 
-			Regex addOp = new Regex(@"^!addop\s(\S+)\s*$");
-			if (addOp.IsMatch(command) && Settings.IsOperator(sender))
-			{
-				string subj = addOp.Match(command).Groups[1].Value;
-				if (!Settings.IsOperator(subj))
-				{
-					Settings.Operators.Add(subj);
-					Settings.SaveOps();
-					rtn += "Operator " + subj + " added successfully.";
-				}
-				else
-				{
-					rtn += "An operator with that name already exists!";
-				}
+            Regex addOp = new Regex(@"^!addop\s(\S+)\s*$");
+            if (addOp.IsMatch(command) && Settings.IsOperator(sender))
+            {
+            	string subj = addOp.Match(command).Groups[1].Value;
+                if (!Settings.IsOperator(subj))
+            	{
+            		Settings.Operators.Add(subj);
+            		Settings.SaveOps();
+            		rtn += "Operator " + subj + " added successfully.";
+            	}
+            	else
+            	{
+            		rtn += "An operator with that name already exists!";
+            	}
 
-				return rtn;
-			}
+            	return rtn;
+            }
 
-			Regex delOp = new Regex(@"^!delop\s(\S+)\s*$");
-			if (delOp.IsMatch(command) && Settings.IsOperator(sender))
-			{
-				string subj = delOp.Match(command).Groups[1].Value;
-				string op = Settings.Operators
-					.Where(oper => oper.ToLower() == subj.ToLower())
-						.FirstOrDefault();
+            Regex delOp = new Regex(@"^!delop\s(\S+)\s*$");
+            if (delOp.IsMatch(command) && Settings.IsOperator(sender))
+            {
+            	string subj = delOp.Match(command).Groups[1].Value;
+            	string op = Settings.Operators
+            		.Where(oper => oper.ToLower() == subj.ToLower())
+            			.FirstOrDefault();
 
-				if (op != null)
-				{
-					if (Settings.IsSuperOperator(op))
-					{
-						rtn += "You can't delete a super operator!";
-					}
-					else
-					{
-						Settings.Operators.Remove(op);
-						Settings.SaveOps();
-						rtn += "Operator " + subj + " deleted successfully.";
-					}
-				}
-				else
-				{
-					rtn += "No such operator found.";
-				}
+            	if (op != null)
+            	{
+            		if (Settings.IsSuperOperator(op))
+            		{
+            			rtn += "You can't delete a super operator!";
+            		}
+            		else
+            		{
+            			Settings.Operators.Remove(op);
+            			Settings.SaveOps();
+            			rtn += "Operator " + subj + " deleted successfully.";
+            		}
+            	}
+            	else
+            	{
+            		rtn += "No such operator found.";
+            	}
 
-				return rtn;
-			}
+            	return rtn;
+            }
 
             return String.Empty;
         }
