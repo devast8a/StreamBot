@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Linq;
 using StreamBot.IRCBot.Sites;
@@ -22,6 +23,7 @@ namespace StreamBot.IRCBot
             return StreamList.Any(stream => stream.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
         }
 
+        // TODO: Clean this up some more. It's pretty ugly.
         public static UpdateStreamResult UpdateStreams()
         {
             List<Stream> tempStreams = new List<Stream>();
@@ -67,49 +69,44 @@ namespace StreamBot.IRCBot
             OnlineStreams.Clear();
             OnlineStreams.AddRange(tempStreams);
 
-            if (OnlineStreams.Count > 0)
+            if (OnlineStreams.Count == 1)
             {
-                string msg = String.Empty;
-                string topic = String.Empty;
-
-                if (OnlineStreams.Count == 1 || OnlineStreams.Count(stream => stream.Status == 1) == 1)
+                Stream streamOne = OnlineStreams.FirstOrDefault(item => item.Status == 1);
+                if (streamOne == null)
                 {
-                    Stream streamOne = (from item in OnlineStreams
-                                        where item.Status == 1
-                                        select item).FirstOrDefault();
-
-                    if (streamOne != null)
-                    {
-                        msg += streamOne.Name + " is now streaming live at " + streamOne.URL + " !";
-                    }
-
-                    if (OnlineStreams[0].Status != 0)
-                        topic += "[LIVE] " + OnlineStreams[0].Name + " streaming at " + OnlineStreams[0].URL + " !";
+                    // The only online stream didn't have a status code of 1, so do nothing.
+                    return new UpdateStreamResult(String.Empty, "No streams are currently online.");
                 }
-                else
+                return new UpdateStreamResult(
+                    String.Format("[LIVE] {0} streaming at {1} !", streamOne.Name, streamOne.URL),
+                    String.Format("{0} is now streaming live at {1} !", streamOne.Name, streamOne.URL)
+                    );
+            }
+
+            if (OnlineStreams.Count > 1)
+            {
+                //"Streams now online: "
+                StringBuilder msg = new StringBuilder();
+                // "[LIVE] Online streams: "
+                StringBuilder topic = new StringBuilder();
+
+                foreach (var stream in OnlineStreams)
                 {
-                    msg = "Streams now online: ";
-                    topic = "[LIVE] Online streams: ";
-                    foreach (var stream in OnlineStreams)
-                    {
-                        if (stream.Status == 1)
-                            msg += stream.Name + " ( " + stream.URL + " ), ";
+                    if (stream.Status == 1)
+                        msg.AppendFormat("{0} ( {1} ), ", stream.Name, stream.URL);
 
-                        if (stream.Status != 0)
-                            topic += stream.Name + " ( " + stream.URL + " ), ";
-                    }
-                    if (msg != "Streams now online: ")
-                        msg = msg.Remove(msg.Length - 2, 2) + "!";
-                    else
-                        msg = String.Empty;
-
-                    if (topic != "[LIVE] Online streams: ")
-                        topic = topic.Remove(topic.Length - 2, 2) + "!";
-                    else
-                        topic = String.Empty;
+                    if (stream.Status != 0)
+                        topic.AppendFormat("{0} ( {1} ), ", stream.Name, stream.URL);
                 }
 
-                return new UpdateStreamResult(topic, msg);
+                // Remove the trailing two characters only if we added data to the StringBuilders
+                if (msg.Length > 0) msg.Remove(msg.Length - 2, 2);
+                if (topic.Length > 0) topic.Remove(topic.Length - 2, 2);
+
+                string actualMsg = msg.Length > 0 ? "Streams now online: " + msg : "No streams are currently online.";
+                string actualTopic = topic.Length > 0 ? "[LIVE] Online streams: " + msg : String.Empty;
+
+                return new UpdateStreamResult(actualTopic, actualMsg);
             }
 
             return new UpdateStreamResult(String.Empty, "No streams are currently online.");
