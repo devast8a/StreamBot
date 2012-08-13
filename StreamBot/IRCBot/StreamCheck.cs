@@ -73,7 +73,7 @@ namespace StreamBot.IRCBot
                 string msg = String.Empty;
                 string topic = String.Empty;
 
-                if (OnlineStreams.Count == 1 || OnlineStreams.Where(stream => stream.Status == 1).Count() == 1)
+                if (OnlineStreams.Count == 1 || OnlineStreams.Count(stream => stream.Status == 1) == 1)
                 {
                     Stream streamOne = (from item in OnlineStreams
                             where item.Status == 1
