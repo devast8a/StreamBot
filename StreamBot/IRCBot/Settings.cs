@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace StreamBot.IRCBot
@@ -31,30 +32,17 @@ namespace StreamBot.IRCBot
 
         public static bool IsOperator (string name)
 		{
-			foreach (var person in Operators)
+			if (Operators.Any(person => person == name))
 			{
-				if (person == name)
-					return true;
+			    return true;
 			}
 
-			foreach (var person in SuperOperators)
-			{
-				if (person == name)
-					return true;
-			}
-
-            return false;
-        }
+            return SuperOperators.Any(person => person == name);
+		}
 
 		public static bool IsSuperOperator (string name)
 		{
-			foreach (var person in SuperOperators)
-			{
-				if (person == name)
-					return true;
-			}
-
-			return false;
+		    return SuperOperators.Any(person => person == name);
 		}
 
         public static void LoadConfig()
