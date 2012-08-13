@@ -7,10 +7,20 @@ namespace StreamBot.IRCBot.Sites
 {
     public class Owned
     {
+        private static readonly Regex LinkId = new Regex(@"^.+/(?<id>\d+)/*$", RegexOptions.Compiled);
+
         public static bool GetStatus(string link)
         {
-            string url = "http://api.own3d.tv/rest/live/status.xml?liveid=";
-            url += Regex.Match(link, @"^.+/(\d+)/*$").Groups [1].Value;
+            string url;
+            Match m = LinkId.Match(link);
+            if (m.Success)
+            {
+                url = String.Format("http://api.own3d.tv/rest/live/status.xml?liveid={0}", m.Groups["id"].Value);
+            }
+            else
+            {
+                return false;
+            }
 
             try
             {
@@ -32,4 +42,3 @@ namespace StreamBot.IRCBot.Sites
         }
     }
 }
-
