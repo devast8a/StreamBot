@@ -31,7 +31,7 @@ namespace StreamBot.IRCBot
     
                     string message = "Stream - " + stream.Name + ", ";
                     message += "URL: " + stream.URL + ", ";
-                    if (stream.Status != 0)
+                    if (stream.Status != StreamStatus.Offline)
                     {
                         message += "Status: Online";
                         if (stream.Subject != String.Empty)

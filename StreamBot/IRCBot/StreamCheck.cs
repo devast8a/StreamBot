@@ -49,11 +49,11 @@ namespace StreamBot.IRCBot
 
                 if (status)
                 {
-                    if (stream.Status == 1)
-                        stream.Status = 2;
+                    if (stream.Status == StreamStatus.NowOnline)
+                        stream.Status = StreamStatus.StillOnline;
 
-                    if (stream.Status == 0)
-                        stream.Status = 1;
+                    if (stream.Status == StreamStatus.Offline)
+                        stream.Status = StreamStatus.NowOnline;
 
                     tempStreams.Add(stream);
                 }
@@ -71,7 +71,7 @@ namespace StreamBot.IRCBot
 
             if (OnlineStreams.Count == 1)
             {
-                Stream streamOne = OnlineStreams.FirstOrDefault(item => item.Status == 1);
+                Stream streamOne = OnlineStreams.FirstOrDefault(item => item.Status == StreamStatus.NowOnline);
                 if (streamOne == null)
                 {
                     // The only online stream didn't have a status code of 1, so do nothing.
@@ -92,10 +92,10 @@ namespace StreamBot.IRCBot
 
                 foreach (var stream in OnlineStreams)
                 {
-                    if (stream.Status == 1)
+                    if (stream.Status == StreamStatus.NowOnline)
                         msg.AppendFormat("{0} ( {1} ), ", stream.Name, stream.URL);
 
-                    if (stream.Status != 0)
+                    if (stream.Status != StreamStatus.Offline)
                         topic.AppendFormat("{0} ( {1} ), ", stream.Name, stream.URL);
                 }
 
