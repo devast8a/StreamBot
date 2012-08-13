@@ -66,7 +66,6 @@ namespace StreamBot.IRCBot
 
             OnlineStreams.Clear();
             OnlineStreams.AddRange(tempStreams);
-            tempStreams.Clear();
 
             if (OnlineStreams.Count > 0)
             {
