@@ -80,22 +80,13 @@ namespace StreamBot.IRCBot
 
             if (command.Trim() == "!operators")
             {
-                rtn += "The operators of this bot are: ";
-                foreach (var op in Settings.Operators)
-                    rtn += op + ", ";
-                rtn = rtn.Remove(rtn.Length - 2, 2) + ".";
-
+                rtn += "The operators of this bot are: " + String.Join(", ", Settings.Operators);
                 return rtn;
             }
                   
             if (command.Trim() == "!streamers" && StreamCheck.StreamList.Any())
             {
-                rtn += "Our current streamers are ";
-                foreach (var stream in StreamCheck.StreamList)
-                {
-                    rtn += stream.Name + ", ";
-                }
-                rtn = rtn.Remove(rtn.Length-2, 2) + ".";
+                rtn += "Our current streamers are " + String.Join(", ", StreamCheck.StreamList);
                 return rtn;
             }
 
