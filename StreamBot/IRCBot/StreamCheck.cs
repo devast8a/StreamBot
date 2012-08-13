@@ -31,7 +31,7 @@ namespace StreamBot.IRCBot
             foreach (var stream in StreamList)
             {
                 string link = stream.URL;
-                bool status = false;
+                bool status;
 
                 Log.AddMessage("Checking stream " + link + "...");
 
@@ -42,6 +42,7 @@ namespace StreamBot.IRCBot
                 catch (UnsupportedSiteException ex)
                 {
                     Log.AddErrorMessage("Unsupported site: " + ex.Message);
+                    continue;
                 }
 
                 if (status)
