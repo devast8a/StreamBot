@@ -27,7 +27,7 @@ namespace StreamBot.IRCBot
                 string subj = StreamCommand.Match(command).Groups[1].Value;
                 if (StreamCheck.StreamExists(subj))
                 {
-                    Stream stream = StreamCheck.StreamList.FirstOrDefault(str => str.Name.ToLower() == subj.ToLower());
+                    Stream stream = StreamCheck.StreamList.FirstOrDefault(str => str.Name.Equals(subj, StringComparison.OrdinalIgnoreCase));
     
                     string message = "Stream - " + stream.Name + ", ";
                     message += "URL: " + stream.URL + ", ";
@@ -105,7 +105,7 @@ namespace StreamBot.IRCBot
                 string url = StreamAddCommand.Match(command).Groups[2].Value;
                 foreach (var stream in StreamCheck.StreamList)
                 {
-                    if (stream.Name.ToLower() == name.ToLower())
+                    if (stream.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
                     {
                         rtn += "A stream with that name already exists.";
                         return rtn;
@@ -126,7 +126,7 @@ namespace StreamBot.IRCBot
                 string name = StreamDelCommand.Match(command).Groups[1].Value;
                 for (int i = StreamCheck.StreamList.Count - 1; i >= 0; --i)
                 {
-                    if (StreamCheck.StreamList[i].Name.ToLower() == name.ToLower())
+                    if (StreamCheck.StreamList[i].Name.Equals(name, StringComparison.OrdinalIgnoreCase))
                     {
                         StreamCheck.StreamList.RemoveAt(i);
 
@@ -182,7 +182,7 @@ namespace StreamBot.IRCBot
             if (DelOpCommand.IsMatch(command) && Settings.IsOperator(sender))
             {
                 string subj = DelOpCommand.Match(command).Groups[1].Value;
-            	string op = Settings.Operators.FirstOrDefault(oper => oper.ToLower() == subj.ToLower());
+            	string op = Settings.Operators.FirstOrDefault(oper => oper.Equals(subj, StringComparison.OrdinalIgnoreCase));
 
             	if (op != null)
             	{
