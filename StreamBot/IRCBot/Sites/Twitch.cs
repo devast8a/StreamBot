@@ -7,10 +7,21 @@ namespace StreamBot.IRCBot.Sites
 {
     public class Twitch
     {
+        public static readonly Regex LinkId = new Regex(@"^.+/(?<id>\S+)/*$", RegexOptions.Compiled);
+
         public static bool GetStatus(string link)
         {
-            string url = "http://api.justin.tv/api/stream/list.xml?channel=";
-            url += Regex.Match(link, @"^.+/(\S+)/*$").Groups [1].Value;
+            string url;
+            Match m = LinkId.Match(link);
+            if (m.Success)
+            {
+                url = String.Format("http://api.justin.tv/api/stream/list.xml?channel={0}", m.Groups["id"]);
+            }
+            else
+            {
+                Log.AddErrorMessage("Invalid Twitch link " + link);
+                return false;
+            }
 
             try
             {
@@ -32,4 +43,3 @@ namespace StreamBot.IRCBot.Sites
         }
     }
 }
-
