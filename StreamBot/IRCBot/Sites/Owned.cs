@@ -19,6 +19,7 @@ namespace StreamBot.IRCBot.Sites
             }
             else
             {
+                Log.AddErrorMessage("Invalid Owned link " + link);
                 return false;
             }
 
