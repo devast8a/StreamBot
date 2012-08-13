@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace StreamBot.IRCBot
 {
@@ -12,12 +14,12 @@ namespace StreamBot.IRCBot
 
         public void Start()
         {
+            List<Stream> streams = _settings.LoadStreams("streams.txt").ToList();
             _settings.LoadConfig("settings.txt");
-            _settings.LoadStreams("streams.txt");
             _settings.LoadOps("ops.txt");
             Log.StartLogging("streambot.log", 1000);
 
-            _checker = new StreamChecker(_settings);
+            _checker = new StreamChecker(_settings) {StreamList = streams};
             _connection = new Connection(_settings, _checker);
         }
     }
