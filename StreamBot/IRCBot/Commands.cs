@@ -94,13 +94,10 @@ namespace StreamBot.IRCBot
             {
                 string name = StreamAddCommand.Match(command).Groups[1].Value;
                 string url = StreamAddCommand.Match(command).Groups[2].Value;
-                foreach (var stream in StreamCheck.StreamList)
+                if (StreamCheck.StreamList.Any(stream => stream.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
                 {
-                    if (stream.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
-                    {
-                        rtn += "A stream with that name already exists.";
-                        return rtn;
-                    }
+                    rtn += "A stream with that name already exists.";
+                    return rtn;
                 }
 
                 Stream newStream = new Stream { Name = name, URL = url, Subject = String.Empty, Status = 0 };
