@@ -5,11 +5,11 @@ using System.Linq;
 
 namespace StreamBot.IRCBot.Sites
 {
-    public class Twitch
+    public class Twitch : IStreamSite
     {
         public static readonly Regex LinkId = new Regex(@"^.+/(?<id>\S+)/*$", RegexOptions.Compiled);
 
-        public static bool GetStatus(string link)
+        public bool GetStatus(string link)
         {
             string url;
             Match m = LinkId.Match(link);

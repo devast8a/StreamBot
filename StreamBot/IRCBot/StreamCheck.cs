@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Linq;
+using StreamBot.IRCBot.Sites;
 
 namespace StreamBot.IRCBot
 {
@@ -10,6 +11,10 @@ namespace StreamBot.IRCBot
         private static readonly Regex Livestream = new Regex(@"^.*Livestream\.com.+$", RegexOptions.Compiled);
         private static readonly Regex Twitch = new Regex(@"^.*Twitch\.tv.+$", RegexOptions.Compiled);
         private static readonly Regex Owned = new Regex(@"^.*own3d\.tv.+$", RegexOptions.Compiled);
+
+        private static readonly Livestream LivestreamSite = new Livestream();
+        private static readonly Twitch TwitchSite = new Twitch();
+        private static readonly Owned OwnedSite = new Owned();
 
         public static List<Stream> StreamList;
         public static List<Stream> OnlineStreams;
@@ -39,11 +44,11 @@ namespace StreamBot.IRCBot
                 Log.AddMessage("Checking stream " + link + "...");
 
                 if (Livestream.IsMatch(link))
-                    status = Sites.Livestream.GetStatus(link);
+                    status = LivestreamSite.GetStatus(link);
                 else if (Twitch.IsMatch(link))
-                    status = Sites.Twitch.GetStatus(link);
+                    status = TwitchSite.GetStatus(link);
                 else if (Owned.IsMatch(link))
-                    status = Sites.Owned.GetStatus(link);
+                    status = OwnedSite.GetStatus(link);
 
                 if (status)
                 {

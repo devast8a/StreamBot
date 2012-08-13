@@ -3,9 +3,9 @@ using HtmlAgilityPack;
 
 namespace StreamBot.IRCBot.Sites
 {
-    public class Livestream
+    public class Livestream : IStreamSite
     {
-        public static bool GetStatus(string link)
+        public bool GetStatus(string link)
         {
             HtmlWeb web = new HtmlWeb();
 

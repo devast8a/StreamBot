@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -31,17 +31,19 @@
     <Externalconsole>true</Externalconsole>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="HtmlAgilityPack">
+      <HintPath>..\..\Libraries\HtmlAgilityPack 1.4.0\HtmlAgilityPack.dll</HintPath>
+    </Reference>
+    <Reference Include="SmartIrc4net">
+      <HintPath>E:\Dev\AGDGBot\AGDGBot\bin\Release\SmartIrc4net.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="HtmlAgilityPack">
-      <HintPath>..\..\..\..\libraries\HTMLAgilityPack\Net40\HtmlAgilityPack.dll</HintPath>
-    </Reference>
+    <Reference Include="System.XML" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="SmartIrc4net">
-      <HintPath>..\..\SmartIrc4net\SmartIrc4net\bin\Release\SmartIrc4net.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IRCBot\Sites\IStreamSite.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="IRCBot\Connection.cs" />
@@ -56,10 +58,7 @@
     <Compile Include="IRCBot\Log.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <ItemGroup>
-    <Folder Include="IRCBot\" />
-    <Folder Include="IRCBot\Sites\" />
-  </ItemGroup>
+  <ItemGroup />
   <ProjectExtensions>
     <MonoDevelop>
       <Properties>
