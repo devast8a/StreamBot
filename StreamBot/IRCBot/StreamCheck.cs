@@ -22,15 +22,9 @@ namespace StreamBot.IRCBot
 
 		public static bool StreamExists(string name)
 		{
-			foreach (var stream in StreamList)
-			{
-				if (stream.Name.ToLower() == name.ToLower())
-					return true;
-			}
-
-			return false;
+		    return StreamList.Any(stream => stream.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
 		}
-       
+
         public static string[] UpdateStreams()
         {
 			List<Stream> tempStreams = new List<Stream>();
