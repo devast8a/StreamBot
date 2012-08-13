@@ -7,6 +7,8 @@ namespace StreamBot.IRCBot
 {
     public class Settings
     {
+        private static readonly Regex SectionRegex = new Regex(@"^\[(.+)\]$", RegexOptions.Compiled);
+
         public static string       Server;
         public static int          Port;
         public static string       Name;
@@ -65,10 +67,9 @@ namespace StreamBot.IRCBot
                 if (String.IsNullOrWhiteSpace(line))
                     continue;
 
-                Regex sectionRegex = new Regex(@"^\[(.+)\]$");
-                if (sectionRegex.IsMatch(line))
+                if (SectionRegex.IsMatch(line))
                 {
-                    section = sectionRegex.Match(line).Groups[1].Value;
+                    section = SectionRegex.Match(line).Groups[1].Value;
                     continue;
                 }
 
@@ -140,7 +141,6 @@ namespace StreamBot.IRCBot
 		public static void LoadOps()
 		{
 			string[] file = File.ReadAllLines("ops.txt");
-			Regex sectionRegex = new Regex(@"^\[(\S+)\]$");
 			string section = String.Empty;
 
 			foreach (var line in file)
@@ -148,9 +148,9 @@ namespace StreamBot.IRCBot
 				if (String.IsNullOrWhiteSpace(line))
 					continue;
 
-				if (sectionRegex.IsMatch(line))
+				if (SectionRegex.IsMatch(line))
 				{
-					section = sectionRegex.Match(line).Groups[1].Value;
+					section = SectionRegex.Match(line).Groups[1].Value;
 					continue;
 				}
 

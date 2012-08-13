@@ -8,6 +8,13 @@ namespace StreamBot.IRCBot
 {
     public class Commands
     {
+        private static readonly Regex StreamCommand = new Regex(@"^!stream\s+(\S+)\s*$", RegexOptions.Compiled);
+        private static readonly Regex StreamAddCommand = new Regex(@"^!addstream\s+(.+)\s+(.+)\s*$", RegexOptions.Compiled);
+        private static readonly Regex StreamDelCommand = new Regex(@"^!delstream\s+(.+)\s*$", RegexOptions.Compiled);
+        private static readonly Regex StreamingCommand = new Regex(@"^!streaming\s+(.+)\s*$", RegexOptions.Compiled);
+        private static readonly Regex AddOpCommand = new Regex(@"^!addop\s(\S+)\s*$", RegexOptions.Compiled);
+        private static readonly Regex DelOpCommand = new Regex(@"^!delop\s(\S+)\s*$", RegexOptions.Compiled);
+
         public static string ParseCommand(string sender, string command, bool isPrivMsg)
         {
             string rtn = String.Empty;
@@ -15,10 +22,9 @@ namespace StreamBot.IRCBot
             if (!isPrivMsg)
                 rtn = sender + ": ";
 
-            Regex streamCheck = new Regex(@"^!stream\s+(\S+)\s*$");
-            if (streamCheck.IsMatch(command))
+            if (StreamCommand.IsMatch(command))
             {
-                string subj = streamCheck.Match(command).Groups [1].Value;
+                string subj = StreamCommand.Match(command).Groups[1].Value;
                 if (StreamCheck.StreamExists(subj))
                 {
                     Stream stream = StreamCheck.StreamList
@@ -95,11 +101,10 @@ namespace StreamBot.IRCBot
                 return rtn;
             }
 
-            Regex addStream = new Regex(@"^!addstream\s+(.+)\s+(.+)\s*$");
-            if (addStream.IsMatch(command) && Settings.IsOperator(sender))
+            if (StreamAddCommand.IsMatch(command) && Settings.IsOperator(sender))
             {
-                string name = addStream.Match(command).Groups[1].Value;
-                string url = addStream.Match(command).Groups[2].Value;
+                string name = StreamAddCommand.Match(command).Groups[1].Value;
+                string url = StreamAddCommand.Match(command).Groups[2].Value;
                 foreach (var stream in StreamCheck.StreamList)
                 {
                     if (stream.Name.ToLower() == name.ToLower())
@@ -109,7 +114,7 @@ namespace StreamBot.IRCBot
                     }
                 }
 
-                Stream newStream = new Stream() { Name = name, URL = url, Subject = String.Empty, Status = 0 };
+                Stream newStream = new Stream { Name = name, URL = url, Subject = String.Empty, Status = 0 };
                 StreamCheck.StreamList.Add(newStream);
 
                 Settings.SaveStreams();
@@ -118,10 +123,9 @@ namespace StreamBot.IRCBot
                 return rtn;
             }
 
-            Regex delStream = new Regex(@"^!delstream\s+(.+)\s*$");
-            if (delStream.IsMatch(command) && Settings.IsOperator(sender))
+            if (StreamDelCommand.IsMatch(command) && Settings.IsOperator(sender))
             {
-                string name = delStream.Match(command).Groups[1].Value;
+                string name = StreamDelCommand.Match(command).Groups[1].Value;
                 for (int i = StreamCheck.StreamList.Count - 1; i >= 0; --i)
                 {
                     if (StreamCheck.StreamList[i].Name.ToLower() == name.ToLower())
@@ -139,14 +143,13 @@ namespace StreamBot.IRCBot
                 return rtn;
             }
 
-            Regex streamer = new Regex(@"^!streaming\s+(.+)\s*$");
-            if (streamer.IsMatch(command))
+            if (StreamingCommand.IsMatch(command))
             {
                 foreach (var stream in StreamCheck.OnlineStreams)
                 {
                     if (stream.Name == sender)
                     {
-                        string subj = streamer.Match(command).Groups[1].Value;                                                                    
+                        string subj = StreamingCommand.Match(command).Groups[1].Value;                                                                    
                         stream.Subject = subj;
                         rtn += "Stream subject changed successfully.";
 
@@ -161,10 +164,9 @@ namespace StreamBot.IRCBot
                 }
             }
 
-            Regex addOp = new Regex(@"^!addop\s(\S+)\s*$");
-            if (addOp.IsMatch(command) && Settings.IsOperator(sender))
+            if (AddOpCommand.IsMatch(command) && Settings.IsOperator(sender))
             {
-            	string subj = addOp.Match(command).Groups[1].Value;
+            	string subj = AddOpCommand.Match(command).Groups[1].Value;
                 if (!Settings.IsOperator(subj))
             	{
             		Settings.Operators.Add(subj);
@@ -179,10 +181,9 @@ namespace StreamBot.IRCBot
             	return rtn;
             }
 
-            Regex delOp = new Regex(@"^!delop\s(\S+)\s*$");
-            if (delOp.IsMatch(command) && Settings.IsOperator(sender))
+            if (DelOpCommand.IsMatch(command) && Settings.IsOperator(sender))
             {
-            	string subj = delOp.Match(command).Groups[1].Value;
+                string subj = DelOpCommand.Match(command).Groups[1].Value;
             	string op = Settings.Operators
             		.Where(oper => oper.ToLower() == subj.ToLower())
             			.FirstOrDefault();

@@ -6,7 +6,11 @@ using System.Linq;
 namespace StreamBot.IRCBot
 {
     public class StreamCheck
-    {        
+    {
+        private static readonly Regex Livestream = new Regex(@"^.*Livestream\.com.+$", RegexOptions.Compiled);
+        private static readonly Regex Twitch = new Regex(@"^.*Twitch\.tv.+$", RegexOptions.Compiled);
+        private static readonly Regex Owned = new Regex(@"^.*own3d\.tv.+$", RegexOptions.Compiled);
+
         public static List<Stream> StreamList;
         public static List<Stream> OnlineStreams;
 
@@ -29,10 +33,6 @@ namespace StreamBot.IRCBot
        
         public static string[] UpdateStreams()
         {
-            Regex livestream = new Regex(@"^.*livestream\.com.+$");
-            Regex twitch     = new Regex(@"^.*twitch\.tv.+$");
-            Regex owned      = new Regex(@"^.*own3d\.tv.+$");
-     
 			List<Stream> tempStreams = new List<Stream>();
             Log.AddMessage("Checking streams.");
             Log.AddMessage("Streams to check: " + StreamList.Count + ".");
@@ -44,11 +44,11 @@ namespace StreamBot.IRCBot
 
                 Log.AddMessage("Checking stream " + link + "...");
 
-                if (livestream.IsMatch(link))
+                if (Livestream.IsMatch(link))
                     status = Sites.Livestream.GetStatus(link);
-                else if (twitch.IsMatch(link))
+                else if (Twitch.IsMatch(link))
                     status = Sites.Twitch.GetStatus(link);
-                else if (owned.IsMatch(link))
+                else if (Owned.IsMatch(link))
                     status = Sites.Owned.GetStatus(link);
 
                 if (status)
