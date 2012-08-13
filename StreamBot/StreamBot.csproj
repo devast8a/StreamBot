@@ -52,7 +52,7 @@
     <Compile Include="IRCBot\Connection.cs" />
     <Compile Include="IRCBot\Bot.cs" />
     <Compile Include="IRCBot\Settings.cs" />
-    <Compile Include="IRCBot\StreamCheck.cs" />
+    <Compile Include="IRCBot\StreamChecker.cs" />
     <Compile Include="IRCBot\Stream.cs" />
     <Compile Include="IRCBot\Sites\Livestream.cs" />
     <Compile Include="IRCBot\Commands.cs" />

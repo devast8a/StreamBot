@@ -10,27 +10,18 @@ namespace StreamBot.IRCBot
     {
         private static readonly Regex SectionRegex = new Regex(@"^\[(.+)\]$", RegexOptions.Compiled);
 
-        public static string       Server;
-        public static int          Port;
-        public static string       Name;
-        public static string       Nickname;
-        public static string       Password;
-        public static List<string> Channels;
-        public static List<string> PrimaryChannels;
-        public static List<string> SecondaryChannels;
-        public static List<string> SuperOperators;
-        public static List<string> Operators;
+        public string       Server;
+        public int          Port;
+        public string       Name;
+        public string       Nickname;
+        public string       Password;
+        public List<string> Channels = new List<string>();
+        public List<string> PrimaryChannels = new List<string>();
+        public List<string> SecondaryChannels = new List<string>();
+        public List<string> SuperOperators = new List<string>();
+        public List<string> Operators = new List<string>();
 
-        static Settings()
-        {
-            PrimaryChannels = new List<string>();
-            SecondaryChannels = new List<string>();
-            Channels = new List<string>();
-			SuperOperators = new List<string>();
-            Operators = new List<string>();
-        }
-
-        public static bool IsOperator (string name)
+        public bool IsOperator (string name)
 		{
 			if (Operators.Any(person => person == name))
 			{
@@ -40,14 +31,14 @@ namespace StreamBot.IRCBot
             return SuperOperators.Any(person => person == name);
 		}
 
-		public static bool IsSuperOperator (string name)
+		public bool IsSuperOperator (string name)
 		{
 		    return SuperOperators.Any(person => person == name);
 		}
 
-        public static void LoadConfig()
+        public void LoadConfig(string filename)
         {
-            string[] file = File.ReadAllLines("settings.txt");
+            string[] file = File.ReadAllLines(filename);
             string section = String.Empty;
 
             foreach (var line in file)
@@ -100,9 +91,9 @@ namespace StreamBot.IRCBot
             Channels.AddRange(SecondaryChannels);
         }
 
-        public static void LoadStreams()
+        public IEnumerable<Stream> LoadStreams(string filename)
         {
-            string[] file = File.ReadAllLines("streams.txt");
+            string[] file = File.ReadAllLines(filename);
             foreach (var line in file)
             {
                 var text = line.Split(new char[] {':'}, 2);
@@ -111,14 +102,14 @@ namespace StreamBot.IRCBot
                 stream.URL = text[1].Trim();
                 stream.Status = 0;
                 stream.Subject = String.Empty;
-                StreamCheck.StreamList.Add(stream);
+                yield return stream;
             }
         }
 
-        public static void SaveStreams()
+        public void SaveStreams(string filename, IEnumerable<Stream> streams)
         {
-            TextWriter writer = new StreamWriter("streams.txt");
-            foreach (var stream in StreamCheck.StreamList)
+            TextWriter writer = new StreamWriter(filename);
+            foreach (var stream in streams)
             {
                 string msg = stream.Name + " : " + stream.URL;
                 writer.WriteLine(msg);
@@ -126,9 +117,9 @@ namespace StreamBot.IRCBot
             writer.Close();
         }
 
-		public static void LoadOps()
+		public void LoadOps(string filename)
 		{
-			string[] file = File.ReadAllLines("ops.txt");
+			string[] file = File.ReadAllLines(filename);
 			string section = String.Empty;
 
 			foreach (var line in file)
@@ -153,7 +144,7 @@ namespace StreamBot.IRCBot
 			}
 		}
 
-		public static void SaveOps()
+		public void SaveOps()
 		{
 			TextWriter writer = new StreamWriter("ops.txt");
 			writer.WriteLine("[SuperOperators]");

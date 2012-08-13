@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Linq;
 using System.Collections.Generic;
+using Meebey.SmartIrc4net;
 
 namespace StreamBot.IRCBot
 {
@@ -15,7 +16,18 @@ namespace StreamBot.IRCBot
         private static readonly Regex AddOpCommand = new Regex(@"^!addop\s(\S+)\s*$", RegexOptions.Compiled);
         private static readonly Regex DelOpCommand = new Regex(@"^!delop\s(\S+)\s*$", RegexOptions.Compiled);
 
-        public static string ParseCommand(string sender, string command, bool isPrivMsg)
+        private readonly Settings _settings;
+        private readonly StreamChecker _checker;
+        private readonly IrcClient _client;
+
+        public Commands(Settings settings, StreamChecker checker, IrcClient client)
+        {
+            _settings = settings;
+            _checker = checker;
+            _client = client;
+        }
+
+        public string ParseCommand(string sender, string command, bool isPrivMsg)
         {
             string rtn = String.Empty;
 
@@ -25,9 +37,9 @@ namespace StreamBot.IRCBot
             if (StreamCommand.IsMatch(command))
             {
                 string subj = StreamCommand.Match(command).Groups[1].Value;
-                if (StreamCheck.StreamExists(subj))
+                if (_checker.StreamExists(subj))
                 {
-                    Stream stream = StreamCheck.StreamList.FirstOrDefault(str => str.Name.Equals(subj, StringComparison.OrdinalIgnoreCase));
+                    Stream stream = _checker.StreamList.FirstOrDefault(str => str.Name.Equals(subj, StringComparison.OrdinalIgnoreCase));
     
                     string message = "Stream - " + stream.Name + ", ";
                     message += "URL: " + stream.URL + ", ";
@@ -56,7 +68,7 @@ namespace StreamBot.IRCBot
 
             if (command.Trim() == "!streams")
             {
-                rtn += StreamCheck.GetOnlineStreams();
+                rtn += _checker.GetOnlineStreams();
                 return rtn;
             }
 
@@ -80,45 +92,45 @@ namespace StreamBot.IRCBot
 
             if (command.Trim() == "!operators")
             {
-                rtn += "The operators of this bot are: " + String.Join(", ", Settings.Operators);
-                return rtn;
-            }
-                  
-            if (command.Trim() == "!streamers" && StreamCheck.StreamList.Any())
-            {
-                rtn += "Our current streamers are " + String.Join(", ", StreamCheck.StreamList);
+                rtn += "The operators of this bot are: " + String.Join(", ", _settings.Operators);
                 return rtn;
             }
 
-            if (StreamAddCommand.IsMatch(command) && Settings.IsOperator(sender))
+            if (command.Trim() == "!streamers" && _checker.StreamList.Any())
+            {
+                rtn += "Our current streamers are " + String.Join(", ", _checker.StreamList);
+                return rtn;
+            }
+
+            if (StreamAddCommand.IsMatch(command) && _settings.IsOperator(sender))
             {
                 string name = StreamAddCommand.Match(command).Groups[1].Value;
                 string url = StreamAddCommand.Match(command).Groups[2].Value;
-                if (StreamCheck.StreamList.Any(stream => stream.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
+                if (_checker.StreamList.Any(stream => stream.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
                 {
                     rtn += "A stream with that name already exists.";
                     return rtn;
                 }
 
                 Stream newStream = new Stream { Name = name, URL = url, Subject = String.Empty, Status = 0 };
-                StreamCheck.StreamList.Add(newStream);
+                _checker.StreamList.Add(newStream);
 
-                Settings.SaveStreams();
+                _settings.SaveStreams("streams.txt", _checker.StreamList);
 
                 rtn += "Stream added successfully.";
                 return rtn;
             }
 
-            if (StreamDelCommand.IsMatch(command) && Settings.IsOperator(sender))
+            if (StreamDelCommand.IsMatch(command) && _settings.IsOperator(sender))
             {
                 string name = StreamDelCommand.Match(command).Groups[1].Value;
-                for (int i = StreamCheck.StreamList.Count - 1; i >= 0; --i)
+                for (int i = _checker.StreamList.Count - 1; i >= 0; --i)
                 {
-                    if (StreamCheck.StreamList[i].Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+                    if (_checker.StreamList[i].Name.Equals(name, StringComparison.OrdinalIgnoreCase))
                     {
-                        StreamCheck.StreamList.RemoveAt(i);
+                        _checker.StreamList.RemoveAt(i);
 
-                        Settings.SaveStreams();
+                        _settings.SaveStreams("streams.txt", _checker.StreamList);
 
                         rtn += "Stream deleted successfully.";
                         return rtn;
@@ -131,7 +143,7 @@ namespace StreamBot.IRCBot
 
             if (StreamingCommand.IsMatch(command))
             {
-                foreach (var stream in StreamCheck.OnlineStreams)
+                foreach (var stream in _checker.OnlineStreams)
                 {
                     if (stream.Name == sender)
                     {
@@ -139,24 +151,24 @@ namespace StreamBot.IRCBot
                         stream.Subject = subj;
                         rtn += "Stream subject changed successfully.";
 
-                        foreach (var chan in Settings.Channels)
+                        foreach (var chan in _settings.Channels)
                         {
                              string subjmsg = stream.Name + " is now streaming " + subj +"!";                                    ;
-                             Connection.irc.SendMessage(Meebey.SmartIrc4net.SendType.Message, chan, subjmsg);                    
+                             _client.SendMessage(SendType.Message, chan, subjmsg);                    
                         }
-
+                        
                         return rtn;
                     }
                 }
             }
 
-            if (AddOpCommand.IsMatch(command) && Settings.IsOperator(sender))
+            if (AddOpCommand.IsMatch(command) && _settings.IsOperator(sender))
             {
             	string subj = AddOpCommand.Match(command).Groups[1].Value;
-                if (!Settings.IsOperator(subj))
+                if (!_settings.IsOperator(subj))
             	{
-            		Settings.Operators.Add(subj);
-            		Settings.SaveOps();
+                    _settings.Operators.Add(subj);
+                    _settings.SaveOps();
             		rtn += "Operator " + subj + " added successfully.";
             	}
             	else
@@ -167,21 +179,21 @@ namespace StreamBot.IRCBot
             	return rtn;
             }
 
-            if (DelOpCommand.IsMatch(command) && Settings.IsOperator(sender))
+            if (DelOpCommand.IsMatch(command) && _settings.IsOperator(sender))
             {
                 string subj = DelOpCommand.Match(command).Groups[1].Value;
-            	string op = Settings.Operators.FirstOrDefault(oper => oper.Equals(subj, StringComparison.OrdinalIgnoreCase));
+                string op = _settings.Operators.FirstOrDefault(oper => oper.Equals(subj, StringComparison.OrdinalIgnoreCase));
 
             	if (op != null)
             	{
-            		if (Settings.IsSuperOperator(op))
+                    if (_settings.IsSuperOperator(op))
             		{
             			rtn += "You can't delete a super operator!";
             		}
             		else
             		{
-            			Settings.Operators.Remove(op);
-            			Settings.SaveOps();
+                        _settings.Operators.Remove(op);
+            			_settings.SaveOps();
             			rtn += "Operator " + subj + " deleted successfully.";
             		}
             	}
