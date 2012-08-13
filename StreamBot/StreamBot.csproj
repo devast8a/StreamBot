@@ -43,6 +43,9 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IRCBot\CommandContext.cs" />
+    <Compile Include="IRCBot\CommandDispatcher.cs" />
+    <Compile Include="IRCBot\ICommandHandler.cs" />
     <Compile Include="IRCBot\Sites\IStreamSite.cs" />
     <Compile Include="IRCBot\Sites\SiteProvider.cs" />
     <Compile Include="IRCBot\Sites\UnsupportedSiteException.cs" />
