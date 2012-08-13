@@ -27,9 +27,7 @@ namespace StreamBot.IRCBot
                 string subj = StreamCommand.Match(command).Groups[1].Value;
                 if (StreamCheck.StreamExists(subj))
                 {
-                    Stream stream = StreamCheck.StreamList
-                        .Where(str => str.Name.ToLower() == subj.ToLower())
-                            .FirstOrDefault();
+                    Stream stream = StreamCheck.StreamList.FirstOrDefault(str => str.Name.ToLower() == subj.ToLower());
     
                     string message = "Stream - " + stream.Name + ", ";
                     message += "URL: " + stream.URL + ", ";
@@ -184,9 +182,7 @@ namespace StreamBot.IRCBot
             if (DelOpCommand.IsMatch(command) && Settings.IsOperator(sender))
             {
                 string subj = DelOpCommand.Match(command).Groups[1].Value;
-            	string op = Settings.Operators
-            		.Where(oper => oper.ToLower() == subj.ToLower())
-            			.FirstOrDefault();
+            	string op = Settings.Operators.FirstOrDefault(oper => oper.ToLower() == subj.ToLower());
 
             	if (op != null)
             	{
