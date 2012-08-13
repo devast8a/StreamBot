@@ -8,14 +8,6 @@ namespace StreamBot.IRCBot
 {
     public class StreamCheck
     {
-        private static readonly Regex Livestream = new Regex(@"^.*Livestream\.com.+$", RegexOptions.Compiled);
-        private static readonly Regex Twitch = new Regex(@"^.*Twitch\.tv.+$", RegexOptions.Compiled);
-        private static readonly Regex Owned = new Regex(@"^.*own3d\.tv.+$", RegexOptions.Compiled);
-
-        private static readonly Livestream LivestreamSite = new Livestream();
-        private static readonly Twitch TwitchSite = new Twitch();
-        private static readonly Owned OwnedSite = new Owned();
-
         public static List<Stream> StreamList;
         public static List<Stream> OnlineStreams;
 
@@ -25,14 +17,14 @@ namespace StreamBot.IRCBot
             OnlineStreams = new List<Stream>();
         }
 
-		public static bool StreamExists(string name)
-		{
-		    return StreamList.Any(stream => stream.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
-		}
+        public static bool StreamExists(string name)
+        {
+            return StreamList.Any(stream => stream.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+        }
 
         public static string[] UpdateStreams()
         {
-			List<Stream> tempStreams = new List<Stream>();
+            List<Stream> tempStreams = new List<Stream>();
             Log.AddMessage("Checking streams.");
             Log.AddMessage("Streams to check: " + StreamList.Count + ".");
 
@@ -43,12 +35,14 @@ namespace StreamBot.IRCBot
 
                 Log.AddMessage("Checking stream " + link + "...");
 
-                if (Livestream.IsMatch(link))
-                    status = LivestreamSite.GetStatus(link);
-                else if (Twitch.IsMatch(link))
-                    status = TwitchSite.GetStatus(link);
-                else if (Owned.IsMatch(link))
-                    status = OwnedSite.GetStatus(link);
+                try
+                {
+                    status = SiteProvider.GetSite(link).GetStatus(link);
+                }
+                catch (UnsupportedSiteException ex)
+                {
+                    Log.AddErrorMessage("Unsupported site: " + ex.Message);
+                }
 
                 if (status)
                 {
@@ -59,7 +53,7 @@ namespace StreamBot.IRCBot
                         stream.Status = 1;
 
                     tempStreams.Add(stream);
-                } 
+                }
                 else
                 {
                     stream.Status = 0;
@@ -69,9 +63,9 @@ namespace StreamBot.IRCBot
 
             Log.AddMessage("Stream checking done.");
 
-			OnlineStreams.Clear();
-			OnlineStreams.AddRange(tempStreams);
-			tempStreams.Clear();
+            OnlineStreams.Clear();
+            OnlineStreams.AddRange(tempStreams);
+            tempStreams.Clear();
 
             if (OnlineStreams.Count > 0)
             {
@@ -81,8 +75,8 @@ namespace StreamBot.IRCBot
                 if (OnlineStreams.Count == 1 || OnlineStreams.Count(stream => stream.Status == 1) == 1)
                 {
                     Stream streamOne = (from item in OnlineStreams
-                            where item.Status == 1
-                            select item).FirstOrDefault();
+                                        where item.Status == 1
+                                        select item).FirstOrDefault();
 
                     if (streamOne != null)
                     {
@@ -105,12 +99,12 @@ namespace StreamBot.IRCBot
                             topic += stream.Name + " ( " + stream.URL + " ), ";
                     }
                     if (msg != "Streams now online: ")
-                        msg = msg.Remove(msg.Length-2, 2) + "!";
+                        msg = msg.Remove(msg.Length - 2, 2) + "!";
                     else
                         msg = String.Empty;
 
                     if (topic != "[LIVE] Online streams: ")
-                        topic = topic.Remove(topic.Length-2, 2) + "!";
+                        topic = topic.Remove(topic.Length - 2, 2) + "!";
                     else
                         topic = String.Empty;
                 }
@@ -133,11 +127,11 @@ namespace StreamBot.IRCBot
                     msg += stream.Name;
                     if (stream.Subject != String.Empty)
                         msg += " (" + stream.Subject + ")";
-                    msg += ", ";  
+                    msg += ", ";
                 }
-                msg += "come chat with us to " + Settings.PrimaryChannels [0] + " !";
+                msg += "come chat with us to " + Settings.PrimaryChannels[0] + " !";
                 return msg;
-            } 
+            }
             else
             {
                 return "No streams are currently online.";
@@ -145,4 +139,3 @@ namespace StreamBot.IRCBot
         }
     }
 }
-
