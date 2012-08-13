@@ -15,7 +15,7 @@ namespace StreamBot.IRCBot.Sites
             try
             {
                 XDocument doc = XDocument.Load(url);
-                if (doc.Descendants("streams").Elements("stream").Any() == true)
+                if (doc.Descendants("streams").Elements("stream").Any())
                 {
                     Log.AddMessage("Stream " + url + " found online!");
                     return true;
