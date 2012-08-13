@@ -37,6 +37,9 @@
       <HintPath>..\..\..\..\libraries\HTMLAgilityPack\Net40\HtmlAgilityPack.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml.Linq" />
+    <Reference Include="SmartIrc4net">
+      <HintPath>..\..\SmartIrc4net\SmartIrc4net\bin\Release\SmartIrc4net.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Main.cs" />

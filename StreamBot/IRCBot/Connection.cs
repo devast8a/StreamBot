@@ -1,108 +1,81 @@
 using System;
 using System.Net.Sockets;
-using System.IO;
 using System.Threading;
+using Meebey.SmartIrc4net;
 
 namespace StreamBot.IRCBot
 {
     public class Connection
     {
-        private static TcpClient     irc = null;
-        private static NetworkStream ns = null;
-        private static StreamReader  sr = null;
-        private static StreamWriter  sw = null;
-
-        public static bool running  = false;
+        public static IrcClient irc = new IrcClient();
 
         public static void Create()
         {
+            irc.Encoding = System.Text.Encoding.UTF8;
+            irc.SendDelay = 500;
+            irc.ActiveChannelSyncing = true;
+            irc.AutoReconnect = true;
+            irc.AutoRejoinOnKick = true;
+            irc.AutoRetry = true;
+            irc.AutoRetryDelay = 10000;
+
+            irc.OnQueryMessage += new IrcEventHandler(OnQueryMessage);
+            irc.OnError += new ErrorEventHandler(OnError);
+            irc.OnRawMessage += new IrcEventHandler(OnRawMessage);
+            irc.OnChannelMessage += new IrcEventHandler(OnChannelMessage);
+
             try
             {
-                irc = new TcpClient(Settings.Server, Settings.Port);
-            } catch
+                irc.Connect(Settings.Server, Settings.Port);
+            }
+            catch (Exception e)
             {
-                Console.WriteLine("Error occured while connecting.");
+                Log.AddErrorMessage(e.Message);
+                System.Environment.Exit(1);
             }
 
             try
             {
-                ns = irc.GetStream();
-                sr = new StreamReader(ns);
-                sw = new StreamWriter(ns);
-            }
-            catch
-            {
-                Console.WriteLine("Error occured while communicating.");
-            }
-            finally
-            {
-                sendData("USER", Settings.Nickname + " argo.com " + "argo.com " + ":" + Settings.Name);
-                sendData("NICK", Settings.Nickname);
-                if (Settings.Password != String.Empty)
-                {
-                    if (Settings.Server.Contains("freenode"))
-                        SendMessage("nickserv", "identify " + Settings.Password);
-                }
+                irc.Login(Settings.Nickname, Settings.Name);
+                if (Settings.Server.Contains("freenode"))
+                    irc.SendMessage(SendType.Message, "NickServ", "identify " + Settings.Password);
+
                 foreach (var channel in Settings.Channels)
-                {
-                    sendData("JOIN", channel);
-                }
-                start();
-            }
-        }
+                    irc.RfcJoin(channel);
 
-        private static void sendData(string command, string args)
-        {
-            if (args == null)
+                new Timer(streamTimer, null, TimeSpan.Zero, TimeSpan.FromMinutes(3));
+
+                irc.Listen();
+                irc.Disconnect();
+            }
+            catch (Exception e)
             {
-                sw.WriteLine(command);
-                sw.Flush();
-                Console.WriteLine(command);
-            }
-            else
-            {
-                sw.WriteLine(command + " " + args);
-                sw.Flush();
-                Console.WriteLine(command + " " + args);
+                Log.AddErrorMessage(e.Message);
+                System.Environment.Exit(2);
             }
         }
 
-        public static void SendMessage(string who, string msg)
+        private static void OnRawMessage(object sender, IrcEventArgs e)
         {
-            sendData("PRIVMSG", who + " :" + msg);
+            Log.AddMessage(e.Data.RawMessage);
         }
 
-        private static void setTopic(string channel, string topic)
+        private static void OnError(object sender, ErrorEventArgs e)
         {
-            sendData("TOPIC", channel + " :" + topic);
+            Log.AddErrorMessage(e.ErrorMessage);
+            System.Environment.Exit(3);
         }
 
-        private static void start()
+        private static void OnQueryMessage(object sender, IrcEventArgs e)
         {
-            string[] ex;
-            string data;
+            string msg = Commands.ParseCommand(e.Data.Nick, e.Data.Message, true);
+            irc.SendMessage(SendType.Message, e.Data.Nick, msg);
+        }
 
-            var newStreamTimer = new Timer(streamTimer, null, TimeSpan.Zero, TimeSpan.FromMinutes(3));
-
-            running = true;
-            while (running)
-            {
-                data = sr.ReadLine();
-                Console.WriteLine(data);
-                char[] sep = new char[] { ' ' };
-                ex = data.Split(sep, 4);
-
-                if (ex[0] == "PING")
-                {
-                    sendData("PONG", null);
-                }
-
-                string[] cmd = Commands.ParseCommands(data);
-                if (cmd[0] != String.Empty && cmd[1] != String.Empty)
-                {
-                    SendMessage(cmd[0], cmd[1]);
-                }
-            }
+        private static void OnChannelMessage(object sender, IrcEventArgs e)
+        {
+            string msg = Commands.ParseCommand(e.Data.Nick, e.Data.Message, false);
+            irc.SendMessage(SendType.Message, e.Data.Channel, msg);
         }
 
         private static string prevtopic = "null";
@@ -113,8 +86,7 @@ namespace StreamBot.IRCBot
             {
                 foreach (var channel in Settings.Channels)
                 {
-                    SendMessage(channel, msg [0]);
-                    Thread.Sleep(TimeSpan.FromSeconds(1));
+                    irc.SendMessage(SendType.Message, channel, msg [0]);
                 }
             }
 
@@ -125,8 +97,7 @@ namespace StreamBot.IRCBot
             {
                 foreach (var channel in Settings.PrimaryChannels)
                 {
-                    setTopic(channel, msg[1]);
-                    Thread.Sleep(TimeSpan.FromSeconds(1));
+                    irc.RfcTopic(channel, msg[1]);
                 }
             }
 
