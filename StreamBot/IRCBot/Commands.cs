@@ -33,14 +33,16 @@ namespace StreamBot.IRCBot
                         if (stream.Subject != String.Empty)
                         {
                             message += ", Streaming: " + stream.Subject;
-                        } else
+                        } 
+                        else
                         {
                             message += "Status: Offline";
                         }
                         rtn += message;
 
                         return rtn;
-                    } else
+                    } 
+                    else
                     {
                         rtn += "No such stream found.";
                     }
