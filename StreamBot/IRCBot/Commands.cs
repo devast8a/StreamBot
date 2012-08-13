@@ -10,46 +10,45 @@ namespace StreamBot.IRCBot
     {
         public static string ParseCommand(string sender, string command, bool isPrivMsg)
         {
-            string rtn = String.Empty;
+        string rtn = String.Empty;
 
-            if (!isPrivMsg)
-                rtn = sender + ": ";
+        if (!isPrivMsg)
+        rtn = sender + ": ";
 
-			Regex streamCheck = new Regex(@"^!stream\s+(\S+)\s*$");
-			if (streamCheck.IsMatch(command))
-			{
-				string subj = streamCheck.Match(command).Groups[1].Value;
-				if (StreamCheck.StreamExists(subj))
-				{
-					Stream stream = StreamCheck.StreamList
-						.Where(str => str.Name.ToLower() == subj.ToLower())
-							.FirstOrDefault();
+        Regex streamCheck = new Regex(@"^!stream\s+(\S+)\s*$");
+        if (streamCheck.IsMatch(command))
+	    {
+            string subj = streamCheck.Match(command).Groups[1].Value;
+            if (StreamCheck.StreamExists(subj))
+            {
+                Stream stream = StreamCheck.StreamList
+                    .Where(str => str.Name.ToLower() == subj.ToLower())
+                        .FirstOrDefault();
 
-                    string message = "Stream - " + stream.Name + ", ";
-					message += "URL: " + stream.URL + ", ";
-					if (stream.Status != 0)
+                string message = "Stream - " + stream.Name + ", ";
+                message += "URL: " + stream.URL + ", ";
+                if (stream.Status != 0)
+                {
+                    message += "Status: Online";
+                    if (stream.Subject != String.Empty)
+                    {
+                        message += ", Streaming: " + stream.Subject;
+                    }					
+                    else
 					{
-						message += "Status: Online";
-						if (stream.Subject != String.Empty)
-						{
-							message += ", Streaming: " + stream.Subject;
-						}
-					}
-					else
-					{
-						message += "Status: Offline";
-					}
-                   	rtn += message;
+                        message += "Status: Offline";
+                    }
+                    rtn += message;
 
-					return rtn;
+                    return rtn;
                 }
-				else
-				{
-					rtn += "No such stream found.";
-				}
+                    else
+                {
+                    rtn += "No such stream found.";
+                }
 
-				return rtn;
-    		}
+                return rtn;
+            }
 
             if (command.Trim() == "!streams")
             {
