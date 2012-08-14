@@ -7,8 +7,8 @@ namespace StreamBot.IRCBot
 {
     public class StreamCheck
     {
-        private static readonly Regex Livestream = new Regex(@"^.*Livestream\.com.+$", RegexOptions.Compiled);
-        private static readonly Regex Twitch = new Regex(@"^.*Twitch\.tv.+$", RegexOptions.Compiled);
+        private static readonly Regex Livestream = new Regex(@"^.*livestream\.com.+$", RegexOptions.Compiled);
+        private static readonly Regex Twitch = new Regex(@"^.*twitch\.tv.+$", RegexOptions.Compiled);
         private static readonly Regex Owned = new Regex(@"^.*own3d\.tv.+$", RegexOptions.Compiled);
 
         public static List<Stream> StreamList;
