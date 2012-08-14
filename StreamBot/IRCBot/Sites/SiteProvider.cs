@@ -4,8 +4,8 @@ namespace StreamBot.IRCBot.Sites
 {
     internal class SiteProvider
     {
-        private static readonly Regex Livestream = new Regex(@"^.*Livestream\.com.+$", RegexOptions.Compiled);
-        private static readonly Regex Twitch = new Regex(@"^.*Twitch\.tv.+$", RegexOptions.Compiled);
+        private static readonly Regex Livestream = new Regex(@"^.*livestream\.com.+$", RegexOptions.Compiled);
+        private static readonly Regex Twitch = new Regex(@"^.*twitch\.tv.+$", RegexOptions.Compiled);
         private static readonly Regex Owned = new Regex(@"^.*own3d\.tv.+$", RegexOptions.Compiled);
 
         private static readonly Livestream LivestreamSite = new Livestream();

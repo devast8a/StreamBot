@@ -98,7 +98,7 @@ namespace StreamBot.IRCBot
 
             if (command.Trim() == "!streamers" && _checker.StreamList.Any())
             {
-                rtn += "Our current streamers are " + String.Join(", ", _checker.StreamList);
+                rtn += "Our current streamers are " + String.Join(", ", _checker.StreamList.Select(x => x.Name));
                 return rtn;
             }
 
