@@ -1,4 +1,5 @@
 using System;
+using StreamBot.IRCBot.StreamPlugins;
 
 namespace StreamBot.IRCBot
 {
@@ -7,12 +8,40 @@ namespace StreamBot.IRCBot
         public string Name;
         public string URL;
         public string Subject;
-        public int Status;
+        public bool Online;
+        public IStreamPlugin Plugin;
 
-        // status
-        //   0 = offline
-        //   1 = online and was offline last tick
-        //   2 = online and was online last tick
+        public void Update(StreamHandler handler)
+        {
+            try
+            {
+                if (Plugin.GetStatus(this))
+                {
+                    if (!Online)
+                    {
+                        handler.NewOnlineStream(this);
+                    }
+                    Online = true;
+                }else
+                {
+                    if(Online)
+                    {
+                        handler.NewOfflineStream(this);
+                    }
+                    Online = false;
+                }
+            }
+            catch(Exception e)
+            {
+                if (Online)
+                {
+                    handler.NewOfflineStream(this);
+                }
+                Online = false;
+
+                handler.Logger.AddErrorMessage(string.Format("While processing stream {0}({1})\n{2}", Name, URL, e));
+            }
+        }
     }
 }
 

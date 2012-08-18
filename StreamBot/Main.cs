@@ -1,4 +1,5 @@
 using System;
+using StreamBot.IRCBot;
 
 namespace StreamBot
 {
@@ -6,14 +7,8 @@ namespace StreamBot
     {
         public static void Main(string[] args)
         {
-            try
-            {
-            	IRCBot.Bot.Start();
-	        }
-        	catch (Exception e)
-        	{
-            	IRCBot.Log.AddErrorMessage(e.Message);  
-            }
+            var bot = new Bot();
+            bot.Connect();
         }
     }
 }

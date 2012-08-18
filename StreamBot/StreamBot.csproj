@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -31,35 +31,37 @@
     <Externalconsole>true</Externalconsole>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="HtmlAgilityPack">
+      <HintPath>..\libs\HtmlAgilityPack.dll</HintPath>
+    </Reference>
+    <Reference Include="SmartIRC4Net">
+      <HintPath>..\libs\SmartIRC4Net.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="HtmlAgilityPack">
-      <HintPath>..\..\..\..\libraries\HTMLAgilityPack\Net40\HtmlAgilityPack.dll</HintPath>
-    </Reference>
+    <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="SmartIrc4net">
-      <HintPath>..\..\SmartIrc4net\SmartIrc4net\bin\Release\SmartIrc4net.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IRCBot\Commands\ICommand.cs" />
+    <Compile Include="IRCBot\Commands\ListStreams.cs" />
+    <Compile Include="IRCBot\Commands\Respond.cs" />
+    <Compile Include="IRCBot\Commands\StreamInfo.cs" />
+    <Compile Include="IRCBot\StreamPlugins\IStreamPlugin.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="IRCBot\Connection.cs" />
     <Compile Include="IRCBot\Bot.cs" />
     <Compile Include="IRCBot\Settings.cs" />
-    <Compile Include="IRCBot\StreamCheck.cs" />
+    <Compile Include="IRCBot\StreamHandler.cs" />
     <Compile Include="IRCBot\Stream.cs" />
-    <Compile Include="IRCBot\Sites\Livestream.cs" />
-    <Compile Include="IRCBot\Commands.cs" />
-    <Compile Include="IRCBot\Sites\Twitch.cs" />
-    <Compile Include="IRCBot\Sites\Owned.cs" />
+    <Compile Include="IRCBot\StreamPlugins\Livestream.cs" />
+    <Compile Include="IRCBot\CommandHandler.cs" />
+    <Compile Include="IRCBot\StreamPlugins\Twitch.cs" />
+    <Compile Include="IRCBot\StreamPlugins\Owned.cs" />
     <Compile Include="IRCBot\Log.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <ItemGroup>
-    <Folder Include="IRCBot\" />
-    <Folder Include="IRCBot\Sites\" />
-  </ItemGroup>
+  <ItemGroup />
   <ProjectExtensions>
     <MonoDevelop>
       <Properties>

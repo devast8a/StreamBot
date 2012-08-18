@@ -6,36 +6,36 @@ namespace StreamBot.IRCBot
 {
     public class Log
     {
-        public static string filename;
-        public static int maxlen;
+        private readonly FileStream _file;
+        private readonly TextWriter _writer;
 
-        public static void StartLogging(string filename, int maxlen)
+        public Log()
         {
-            Log.filename = filename;
-            Log.maxlen = maxlen;
-            if (File.Exists(filename))
-                File.Delete(filename);
+            if(!Directory.Exists("logs"))
+            {
+                Directory.CreateDirectory("logs");
+            }
+
+            _file = new FileStream("logs/" + DateTime.Now.ToString("yyyy-MM-dd") + ".log", FileMode.Append);
+            _writer = new StreamWriter(_file);
+        }
+        
+        public void AddMessage(string message)
+        {
+            var msg = DateTime.Now.ToString("[HH:mm] ") + message;
+
+            _writer.WriteLine(msg);
+            _writer.Flush();
+            Console.WriteLine(msg);
         }
 
-        public static void AddMessage(string message)
+        public void AddErrorMessage(string message)
         {
-            string msg = DateTime.Now.ToString("[HH:mm] ") + message;
-            File.AppendAllText(Log.filename, msg + "\n");
-            CleanFile();
-        }
+            var msg = DateTime.Now.ToString("[HH:mm] ") + " **ERROR** " + message;
 
-        public static void AddErrorMessage(string message)
-        {
-            string msg = DateTime.Now.ToString("[HH:mm]") + " *ERROR* " + message;
-            File.AppendAllText(Log.filename, msg + "\n");
-            CleanFile();
-        }
-
-        private static void CleanFile()
-        {
-            int len = File.ReadAllLines(filename).Length;
-            if (len > maxlen)
-                File.WriteAllLines(filename, File.ReadAllLines(filename).Skip(len - maxlen).ToArray());
+            _writer.WriteLine(msg);
+            _writer.Flush();
+            Console.WriteLine(msg);
         }
     }
 }
