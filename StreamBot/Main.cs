@@ -7,14 +7,8 @@ namespace StreamBot
     {
         public static void Main(string[] args)
         {
-            try
-            {
-            	new Bot().Start();
-	        }
-        	catch (Exception e)
-        	{
-            	Log.AddErrorMessage(e.Message);  
-            }
+            var bot = new Bot();
+            bot.Connect();
         }
     }
 }

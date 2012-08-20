@@ -15,30 +15,26 @@ namespace StreamBot.IRCBot
         public string       Name;
         public string       Nickname;
         public string       Password;
-        public List<string> Channels = new List<string>();
-        public List<string> PrimaryChannels = new List<string>();
-        public List<string> SecondaryChannels = new List<string>();
-        public List<string> SuperOperators = new List<string>();
-        public List<string> Operators = new List<string>();
+        public int          CheckPeriod = 3 * 60;
+        public List<string> Channels;
+        public List<string> PrimaryChannels;
+        public List<string> SecondaryChannels;
+        public Dictionary<string, Permission> Permissions;
+        readonly StreamHandler _handler;
 
-        public bool IsOperator (string name)
-		{
-			if (Operators.Any(person => person == name))
-			{
-			    return true;
-			}
-
-            return SuperOperators.Any(person => person == name);
-		}
-
-		public bool IsSuperOperator (string name)
-		{
-		    return SuperOperators.Any(person => person == name);
-		}
-
-        public void LoadConfig(string filename)
+        public Settings(StreamHandler handler)
         {
-            string[] file = File.ReadAllLines(filename);
+            PrimaryChannels = new List<string>();
+            SecondaryChannels = new List<string>();
+            Channels = new List<string>();
+            Permissions = new Dictionary<string, Permission>();
+
+            _handler = handler;
+        }
+
+        public void LoadConfig()
+        {
+            string[] file = File.ReadAllLines("settings.txt");
             string section = String.Empty;
 
             foreach (var line in file)
@@ -54,7 +50,7 @@ namespace StreamBot.IRCBot
 
                 if (section == "ConnectionSettings")
                 {
-                    string[] pair = line.Split(new char[] {'='}, 2);
+                    string[] pair = line.Split(new[] {'='}, 2);
 
                     switch (pair[0])
                     {
@@ -76,6 +72,18 @@ namespace StreamBot.IRCBot
                     }
                 }
 
+                if(section == "General")
+                {
+                    string[] pair = line.Split(new[] { '=' }, 2);
+
+                    switch(pair[0])
+                    {
+                        case "period":
+                            CheckPeriod = Convert.ToInt32(pair[1]);
+                            break;
+                    }
+                }
+
                 if (section == "PrimaryChannels")
                 {
                     PrimaryChannels.Add(line);
@@ -91,74 +99,66 @@ namespace StreamBot.IRCBot
             Channels.AddRange(SecondaryChannels);
         }
 
-        public IEnumerable<Stream> LoadStreams(string filename)
+        public void LoadStreams()
         {
-            string[] file = File.ReadAllLines(filename);
+            string[] file = File.ReadAllLines("streams.txt");
             foreach (var line in file)
             {
-                var text = line.Split(new char[] {':'}, 2);
-                Stream stream = new Stream();
-                stream.Name = text[0].Trim();
-                stream.URL = text[1].Trim();
-                stream.Status = 0;
-                stream.Subject = String.Empty;
-                yield return stream;
+                var text = line.Split(new[]{':'}, 2);
+                
+                if(!_handler.AddStream(text[0].Trim(), text[1].Trim()))
+                {
+                    _handler.Logger.AddErrorMessage(string.Format("{0} can not be handled by any stream status plugins", text[1].Trim()));
+                }
             }
         }
 
-        public void SaveStreams(string filename, IEnumerable<Stream> streams)
+        public void SaveStreams()
         {
-            TextWriter writer = new StreamWriter(filename);
-            foreach (var stream in streams)
+            TextWriter writer = new StreamWriter("streams.txt");
+            foreach (var stream in _handler.StreamList)
             {
-                string msg = stream.Name + " : " + stream.URL;
-                writer.WriteLine(msg);
+                writer.WriteLine("{0} : {1}", stream.Name, stream.URL);
             }
             writer.Close();
         }
 
-		public void LoadOps(string filename)
-		{
-			string[] file = File.ReadAllLines(filename);
-			string section = String.Empty;
+        public void LoadOps()
+        {
+            string[] file = File.ReadAllLines("ops.txt");
 
-			foreach (var line in file)
-			{
-				if (String.IsNullOrWhiteSpace(line))
-					continue;
+            foreach (var line in file)
+            {
+                var parts = line.Split(new[]{':'}, 2);
 
-				if (SectionRegex.IsMatch(line))
-				{
-					section = SectionRegex.Match(line).Groups[1].Value;
-					continue;
-				}
+                switch(parts[0])
+                {
+                    case "SuperOperator":
+                        Permissions.Add(parts[1], new Permission(){Operator = true, SuperOperator = true});
+                        break;
 
-				if (section == "SuperOperators")
-				{
-					SuperOperators.Add(line);
-					Operators.Add(line);
-				}
+                    case "Operator":
+                        Permissions.Add(parts[1], new Permission(){Operator = true});
+                        break;
 
-				if (section == "Operators")
-					Operators.Add(line);
-			}
-		}
+                    default:
+                        _handler.Logger.AddErrorMessage("Unknown permission: " + parts[0]);
+                        break;
+                }
+            }
+        }
 
-		public void SaveOps()
-		{
-			TextWriter writer = new StreamWriter("ops.txt");
-			writer.WriteLine("[SuperOperators]");
-			foreach (var supop in SuperOperators)
-				writer.WriteLine(supop);
-			writer.WriteLine();
-			writer.WriteLine("[Operators]");
-			foreach (var op in Operators)
-			{
-				if (!IsSuperOperator(op))
-					writer.WriteLine(op);
-			}
-			writer.Close();
-		}
+        public void SaveOps()
+        {
+            TextWriter writer = new StreamWriter("ops.txt");
+            foreach(var permission in Permissions){
+                if (permission.Value.Name != null)
+                {
+                    writer.WriteLine("{0}:{1}", permission.Value.Name, permission.Key);
+                }
+            }
+            writer.Close();
+        }
     }
 }
 
