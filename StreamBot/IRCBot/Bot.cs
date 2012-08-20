@@ -11,6 +11,9 @@ namespace StreamBot.IRCBot
         private readonly CommandHandler _commandHandler;
         private readonly StreamHandler _streamHandler;
 
+        private readonly Permission _channelOperatorPermission;
+        private readonly Permission _normalUserPermission;
+
         public Settings Settings;
         public Log Logger;
 
@@ -48,6 +51,18 @@ namespace StreamBot.IRCBot
             _commandHandler.Add("!guide", new Respond(
                 "A step by step guide on how to set up your own stream can be found here: " +
                 "http://vidyadev.com/wiki/A_guide_to_streaming"));
+
+            _commandHandler.Add("!addstream", new SecureCommand(x => x.Operator,
+                new AddStream(_streamHandler)
+            ));
+
+            _commandHandler.Add("!remstream", new SecureCommand(x => x.Operator,
+                new RemoveStream(_streamHandler)
+            ));
+
+            // Setup permissions
+            _channelOperatorPermission = new Permission() { Operator = true };
+            _normalUserPermission = new Permission();
         }
 
 
@@ -90,7 +105,7 @@ namespace StreamBot.IRCBot
                     _irc.RfcJoin(channel);
                 }
 
-                new Timer(StreamTimer, null, TimeSpan.Zero, TimeSpan.FromMinutes(3));
+                new Timer(StreamTimer, null, TimeSpan.Zero, TimeSpan.FromSeconds(Settings.CheckPeriod));
 
                 _irc.Listen();
                 _irc.Disconnect();
@@ -123,7 +138,14 @@ namespace StreamBot.IRCBot
 
         private void OnQueryMessage(object sender, IrcEventArgs e)
         {
-            string msg = _commandHandler.ParseCommand(e.Data.Nick, e.Data.Message);
+            Permission permission;
+
+            if (!Settings.Permissions.TryGetValue(e.Data.Host, out permission))
+            {
+                permission = _normalUserPermission;
+            }
+
+            string msg = _commandHandler.ParseCommand(e.Data.Nick, permission, e.Data.Message);
 
             if (msg != null)
             {
@@ -133,7 +155,24 @@ namespace StreamBot.IRCBot
 
         private void OnChannelMessage(object sender, IrcEventArgs e)
         {
-            string msg = _commandHandler.ParseCommand(e.Data.Nick, e.Data.Message);
+            var user = _irc.GetChannelUser(e.Data.Channel, e.Data.Nick);
+            
+            Permission permission;
+
+            if (!Settings.Permissions.TryGetValue(e.Data.Host, out permission))
+            {
+
+                if (user.IsOp && Settings.PrimaryChannels.Contains(e.Data.Channel))
+                {
+                    permission = _channelOperatorPermission;
+                }
+                else
+                {
+                    permission = _normalUserPermission;
+                }
+            }
+
+            string msg = _commandHandler.ParseCommand(e.Data.Nick, permission, e.Data.Message);
 
             if (msg != null)
             {

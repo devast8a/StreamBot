@@ -14,7 +14,7 @@ namespace StreamBot.IRCBot.Commands
             _handler = handler;
         }
 
-        public string Parse(string sender, string[] arguments)
+        public string Parse(string sender, Permission permission, string[] arguments)
         {
             var stream = _handler.GetStream(arguments[1]);
 

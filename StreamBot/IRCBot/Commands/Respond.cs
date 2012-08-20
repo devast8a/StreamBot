@@ -7,14 +7,14 @@ namespace StreamBot.IRCBot.Commands
 {
     class Respond : ICommand
     {
-        private string _text;
+        private readonly string _text;
 
         public Respond(string text)
         {
             _text=text;
         }
 
-        public string Parse(string sender, string[] arguments)
+        public string Parse(string sender, Permission permission, string[] arguments)
         {
             return _text;
         }

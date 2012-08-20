@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Linq;
 using System.Collections.Generic;
+using Meebey.SmartIrc4net;
 using StreamBot.IRCBot.Commands;
 
 namespace StreamBot.IRCBot
@@ -16,7 +17,7 @@ namespace StreamBot.IRCBot
             _commands.Add(text, command);
         }
  
-        public string ParseCommand(string sender, string message)
+        public string ParseCommand(string sender, Permission permission, string message)
         {
             var split = message.Split(' ');
 
@@ -24,7 +25,7 @@ namespace StreamBot.IRCBot
 
             if(_commands.TryGetValue(split[0], out command))
             {
-                return command.Parse(sender, split);
+                return command.Parse(sender, permission, split);
             }
 
             return null;

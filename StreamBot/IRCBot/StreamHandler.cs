@@ -31,7 +31,7 @@ namespace StreamBot.IRCBot
             };
         }
 
-        public void AddStream(string name, string url)
+        public bool AddStream(string name, string url)
         {
             var stream = new Stream();
 
@@ -40,13 +40,9 @@ namespace StreamBot.IRCBot
             
             stream.Plugin = _streamPlugins.FirstOrDefault(x => x.UseFor(stream));
 
-            if(stream.Plugin == null)
-            {
-                Logger.AddErrorMessage(string.Format("{0} can not be handled by any stream status plugins", url));
-            }else
-            {
-                StreamList.Add(stream);
-            }
+            StreamList.Add(stream);
+
+            return stream.Plugin != null;
         }
 
         public bool StreamExists(string name)

@@ -15,6 +15,11 @@ namespace StreamBot.IRCBot
         {
             try
             {
+                if(Plugin == null)
+                {
+                    return;
+                }
+
                 if (Plugin.GetStatus(this))
                 {
                     if (!Online)
