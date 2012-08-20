@@ -29,7 +29,7 @@ namespace StreamBot.IRCBot
             Port = (int?)_source.Attribute("Port") ?? 6667;
             Nickname = (string)_source.Attribute("Nickname");
             Password = (string)_source.Attribute("Password");
-            Period = (TimeSpan?)_source.Attribute("Period") ?? TimeSpan.FromSeconds(180);
+            Period = TimeSpan.FromSeconds((int?)_source.Attribute("Period") ?? 180);
         }
 
         public IEnumerable<Permission> GetPermissions()

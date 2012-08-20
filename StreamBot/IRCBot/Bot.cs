@@ -8,6 +8,8 @@ namespace StreamBot.IRCBot
 {
     public class Bot
     {
+        public static string Version = "1.0";
+
         private readonly IrcClient _irc;
         private readonly CommandHandler _commandHandler;
         private readonly StreamHandler _streamHandler;
@@ -25,6 +27,8 @@ namespace StreamBot.IRCBot
             _irc = new IrcClient();
             _commandHandler = new CommandHandler();
             Settings = settings;
+
+            Logger.AddMessage("StreamBot Version " + Version);
 
             foreach (var stream in Settings.GetStreams())
             {
@@ -65,11 +69,14 @@ namespace StreamBot.IRCBot
             // Setup permissions
             _channelOperatorPermission = new Permission() {Operator = true};
             _normalUserPermission = new Permission();
+
+            Logger.AddMessage("Bot loaded, ready to connect.");
         }
 
 
         public void Connect()
         {
+            Logger.AddMessage(string.Format("Connecting to: {0}:{1}", Settings.Server, Settings.Port));
             try
             {
                 _irc.Encoding = System.Text.Encoding.UTF8;
@@ -92,6 +99,8 @@ namespace StreamBot.IRCBot
                 Logger.AddErrorMessage(e.ToString());
                 Environment.Exit(1);
             }
+
+            Logger.AddMessage("Connected! Joining channels");
 
             try
             {
