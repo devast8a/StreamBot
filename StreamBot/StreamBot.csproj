@@ -55,7 +55,7 @@
     <Compile Include="Main.cs" />
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="IRCBot\Bot.cs" />
-    <Compile Include="IRCBot\Settings.cs" />
+    <Compile Include="IRCBot\SettingsInstance.cs" />
     <Compile Include="IRCBot\StreamHandler.cs" />
     <Compile Include="IRCBot\Stream.cs" />
     <Compile Include="IRCBot\StreamPlugins\Livestream.cs" />
@@ -63,6 +63,7 @@
     <Compile Include="IRCBot\StreamPlugins\Twitch.cs" />
     <Compile Include="IRCBot\StreamPlugins\Owned.cs" />
     <Compile Include="IRCBot\Log.cs" />
+    <Compile Include="IRCBot\SettingsFile.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />

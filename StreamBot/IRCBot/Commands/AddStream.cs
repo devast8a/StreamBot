@@ -8,9 +8,9 @@ namespace StreamBot.IRCBot.Commands
     class AddStream : ICommand
     {
         readonly StreamHandler _handler;
-        private readonly Settings _settings;
+        private readonly SettingsInstance _settings;
 
-        public AddStream(StreamHandler handler, Settings settings)
+        public AddStream(StreamHandler handler, SettingsInstance settings)
         {
             _handler=handler;
             _settings = settings;
@@ -40,7 +40,7 @@ namespace StreamBot.IRCBot.Commands
                 return "Error - The URL provided can not be handled by any stream plugins.";
             }
 
-            _settings.SaveStreams();
+            _settings.AddStream(name, url);
             _handler.Logger.AddMessage(string.Format("{0} added a new stream. {1} - {2}", sender, name, url));
             return string.Format("Success, {0} added as a new streamer", name);
         }

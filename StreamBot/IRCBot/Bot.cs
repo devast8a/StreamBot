@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading;
 using Meebey.SmartIrc4net;
 using StreamBot.IRCBot.Commands;
@@ -14,32 +15,33 @@ namespace StreamBot.IRCBot
         private readonly Permission _channelOperatorPermission;
         private readonly Permission _normalUserPermission;
 
-        public Settings Settings;
+        public SettingsInstance Settings;
         public Log Logger;
 
-        public Bot()
+        public Bot(SettingsInstance settings)
         {
-            Logger           = new Log();
-            _streamHandler   = new StreamHandler(this);
-            _irc             = new IrcClient();
-            _commandHandler  = new CommandHandler();
-            Settings         = new Settings(_streamHandler);
+            Logger = new Log();
+            _streamHandler = new StreamHandler(this);
+            _irc = new IrcClient();
+            _commandHandler = new CommandHandler();
+            Settings = settings;
 
-            Settings.LoadOps();
-            Settings.LoadConfig();
-            Settings.LoadStreams();
+            foreach (var stream in Settings.GetStreams())
+            {
+                _streamHandler.AddStream(stream.Name, stream.URL);
+            }
 
             // Load up all the commands
             _commandHandler.Add("!streamers", new ListStreams(_streamHandler)
-                {
-                    ErrorMessage = "Sorry, there are no streamers.",
-                });
+            {
+                ErrorMessage = "Sorry, there are no streamers.",
+            });
 
             _commandHandler.Add("!streams", new ListStreams(_streamHandler, x => x.Online)
-                {
-                    ErrorMessage = "Sorry, no one is currently streaming.",
-                    Format = "Current online streamers: {0}",
-                });
+            {
+                ErrorMessage = "Sorry, no one is currently streaming.",
+                Format = "Current online streamers: {0}",
+            });
 
             _commandHandler.Add("!stream", new StreamInfo(_streamHandler));
 
@@ -54,14 +56,14 @@ namespace StreamBot.IRCBot
 
             _commandHandler.Add("!addstream", new SecureCommand(x => x.Operator,
                 new AddStream(_streamHandler, Settings)
-            ));
+                ));
 
             _commandHandler.Add("!remstream", new SecureCommand(x => x.Operator,
                 new RemoveStream(_streamHandler, Settings)
-            ));
+                ));
 
             // Setup permissions
-            _channelOperatorPermission = new Permission() { Operator = true };
+            _channelOperatorPermission = new Permission() {Operator = true};
             _normalUserPermission = new Permission();
         }
 
@@ -70,21 +72,21 @@ namespace StreamBot.IRCBot
         {
             try
             {
-                _irc.Encoding             = System.Text.Encoding.UTF8;
-                _irc.SendDelay            = 500;
+                _irc.Encoding = System.Text.Encoding.UTF8;
+                _irc.SendDelay = 500;
                 _irc.ActiveChannelSyncing = true;
-                _irc.AutoReconnect        = true;
-                _irc.AutoRejoinOnKick     = true;
-                _irc.AutoRetry            = true;
-                _irc.AutoRetryDelay       = 10000;
+                _irc.AutoReconnect = true;
+                _irc.AutoRejoinOnKick = true;
+                _irc.AutoRetry = true;
+                _irc.AutoRetryDelay = 10000;
 
-                _irc.OnQueryMessage   += OnQueryMessage;
-                _irc.OnError          += OnError;
+                _irc.OnQueryMessage += OnQueryMessage;
+                _irc.OnError += OnError;
                 _irc.OnChannelMessage += OnChannelMessage;
 
                 _irc.Connect(Settings.Server, Settings.Port);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 // Log this shit
                 Logger.AddErrorMessage(e.ToString());
@@ -93,24 +95,24 @@ namespace StreamBot.IRCBot
 
             try
             {
-                _irc.Login(Settings.Nickname, Settings.Name);
+                _irc.Login(Settings.Nickname, "Name");
 
-                if (Settings.Server.Contains("freenode"))
+                if (!String.IsNullOrWhiteSpace(Settings.Password))
                 {
                     _irc.SendMessage(SendType.Message, "NickServ", "identify " + Settings.Password);
                 }
 
-                foreach (var channel in Settings.Channels)
+                foreach (var channel in Settings.GetPrimaryChannels().Union(Settings.GetSecondaryChannels()))
                 {
                     _irc.RfcJoin(channel);
                 }
 
-                new Timer(StreamTimer, null, TimeSpan.Zero, TimeSpan.FromSeconds(Settings.CheckPeriod));
+                new Timer(StreamTimer, null, TimeSpan.Zero, Settings.Period);
 
                 _irc.Listen();
                 _irc.Disconnect();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Logger.AddErrorMessage(e.ToString());
                 Environment.Exit(2);
@@ -119,12 +121,12 @@ namespace StreamBot.IRCBot
 
         public void SendMessage(string message)
         {
-            foreach (var channel in Settings.PrimaryChannels)
+            foreach (var channel in Settings.GetPrimaryChannels())
             {
                 _irc.SendMessage(SendType.Message, channel, message);
             }
 
-            foreach(var channel in Settings.SecondaryChannels)
+            foreach (var channel in Settings.GetSecondaryChannels())
             {
                 _irc.SendMessage(SendType.Message, channel, message);
             }
@@ -138,9 +140,11 @@ namespace StreamBot.IRCBot
 
         private void OnQueryMessage(object sender, IrcEventArgs e)
         {
-            Permission permission;
+            Permission permission = _channelOperatorPermission;
 
-            if (!Settings.Permissions.TryGetValue(e.Data.Host, out permission))
+            // If there is no permission record associated with this hostname
+            // then treat this user as a normal user
+            if (Settings.GetPermission(e.Data.Host) == null)
             {
                 permission = _normalUserPermission;
             }
@@ -156,19 +160,17 @@ namespace StreamBot.IRCBot
         private void OnChannelMessage(object sender, IrcEventArgs e)
         {
             var user = _irc.GetChannelUser(e.Data.Channel, e.Data.Nick);
+
+            Permission permission = _normalUserPermission;
             
-            Permission permission;
-
-            if (!Settings.Permissions.TryGetValue(e.Data.Host, out permission))
+            // If there is no permission record associated with this hostname
+            // see if he's an op on a primary channel
+            if (Settings.GetPermission(e.Data.Host) != null)
             {
-
-                if (user.IsOp && Settings.PrimaryChannels.Contains(e.Data.Channel))
+                if (user.IsOp &&
+                    Settings.GetPrimaryChannels().Any(a => a.Equals(e.Data.Channel, StringComparison.OrdinalIgnoreCase)))
                 {
                     permission = _channelOperatorPermission;
-                }
-                else
-                {
-                    permission = _normalUserPermission;
                 }
             }
 
@@ -179,11 +181,10 @@ namespace StreamBot.IRCBot
                 _irc.SendMessage(SendType.Message, e.Data.Channel, string.Format("{0}: {1}", e.Data.Nick, msg));
             }
         }
-        
+
         private void StreamTimer(object sender)
         {
             _streamHandler.UpdateStreams();
         }
     }
 }
-

@@ -3,9 +3,9 @@ namespace StreamBot.IRCBot.Commands
     public class RemoveStream : ICommand
     {
         readonly StreamHandler _handler;
-        private readonly Settings _settings;
+        private readonly SettingsInstance _settings;
 
-        public RemoveStream(StreamHandler handler, Settings settings)
+        public RemoveStream(StreamHandler handler, SettingsInstance settings)
         {
             _handler=handler;
             _settings = settings;
@@ -16,7 +16,7 @@ namespace StreamBot.IRCBot.Commands
             if (arguments.Length == 2)
             {
                 var resp = _handler.StreamList.RemoveAll((x) => x.Name == arguments[1]) > 0 ? "Deleted " + arguments[1] : "No streamer exists by that name";
-                _settings.SaveStreams();
+                _settings.RemoveStream(arguments[1]);
                 return resp;
             }
 
