@@ -59,13 +59,13 @@ namespace StreamBot.IRCBot
                 "A step by step guide on how to set up your own stream can be found here: " +
                 "http://vidyadev.com/wiki/A_guide_to_streaming"));
 
-            _commandHandler.Add("!addstream", new SecureCommand(x => x.Operator,
+            _commandHandler.Add("!addstream", new SecureCommand(x => x.IsOperator,
                 new AddStream(_streamHandler, Settings)
                 ));
 
             _commandHandler.Add("!version", new Respond(Assembly.GetCallingAssembly().GetName().Version.ToString()));
 
-            _commandHandler.Add("!remstream", new SecureCommand(x => x.Operator,
+            _commandHandler.Add("!remstream", new SecureCommand(x => x.IsOperator,
                 new RemoveStream(_streamHandler, Settings)
                 ));
 

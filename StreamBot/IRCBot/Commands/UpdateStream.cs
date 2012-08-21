@@ -15,7 +15,7 @@ namespace StreamBot.IRCBot.Commands
 
             if(args.Args.Count != 0)
             {
-                if(!permission.Operator)
+                if(!permission.IsOperator)
                 {
                     return string.Format("Error - usage {0}. Operators may force updates of other streamers", args.Name);
                 }

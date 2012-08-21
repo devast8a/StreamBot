@@ -34,12 +34,12 @@ namespace StreamBot.IRCBot
         {
             var permissions = EnsureExists("Permissions");
 
-            foreach (var so in permissions.Elements("SuperOperator"))
+            foreach (var so in permissions.Elements("IsSuperOperator"))
             {
                 yield return new Permission((string)so.Attribute("Hostname"), true, true);
             }
 
-            foreach (var so in permissions.Elements("Operator"))
+            foreach (var so in permissions.Elements("IsOperator"))
             {
                 yield return new Permission((string)so.Attribute("Hostname"), true, false);
             }
