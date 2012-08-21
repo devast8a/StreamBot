@@ -66,7 +66,7 @@ namespace StreamBot.IRCBot
 
         public void NewOnlineStream(Stream stream)
         {
-            _bot.SendMessage(string.Format("{0} has started streaming over at {1}", stream.Name, stream.URL));
+            _bot.SendMessage(string.Format("{0} has started streaming over at {1}", stream.Name, stream.Url));
         }
 
         public Stream GetStream(string streamName)
@@ -81,7 +81,7 @@ namespace StreamBot.IRCBot
                 return;
             }
 
-            _bot.SendMessage(string.Format("{0} - {1} - Is now streaming {2}", stream.Name, stream.URL, stream.Subject));
+            _bot.SendMessage(string.Format("{0} - {1} - Is now streaming {2}", stream.Name, stream.Url, stream.Subject));
         }
     }
 }

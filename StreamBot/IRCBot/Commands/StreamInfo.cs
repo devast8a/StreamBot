@@ -30,7 +30,7 @@
                 subject = " - Streaming: " + stream.Subject;
             }
 
-            return string.Format("{0} - {1} - {2}{3}", stream.Name, stream.URL, stream.Online ? "Online" : "Offline", subject);
+            return string.Format("{0} - {1} - {2}{3}", stream.Name, stream.Url, stream.Online ? "Online" : "Offline", subject);
         }
     }
 }

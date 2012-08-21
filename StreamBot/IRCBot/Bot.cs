@@ -33,7 +33,7 @@ namespace StreamBot.IRCBot
 
             foreach (var stream in Settings.GetStreams())
             {
-                _streamHandler.AddStream(stream.Name, stream.URL);
+                _streamHandler.AddStream(stream.Name, stream.Url);
             }
 
             // Load up all the commands

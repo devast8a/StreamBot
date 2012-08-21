@@ -6,7 +6,7 @@ namespace StreamBot.IRCBot
     public class Stream
     {
         public string Name { get; private set; }
-        public string URL { get; private set; }
+        public string Url { get; private set; }
         public string Subject { get; set; }
         public bool Online { get; set; }
         public IStreamPlugin Plugin { get; set; }
@@ -14,7 +14,7 @@ namespace StreamBot.IRCBot
         public Stream(string name, string url)
         {
             Name = name;
-            URL = url;
+            Url = url;
         }
 
         public void Update(StreamHandler handler)
@@ -51,7 +51,7 @@ namespace StreamBot.IRCBot
                 }
                 Online = false;
 
-                handler.Logger.AddErrorMessage(string.Format("While processing stream {0}({1})\n{2}", Name, URL, e));
+                handler.Logger.AddErrorMessage(string.Format("While processing stream {0}({1})\n{2}", Name, Url, e));
             }
         }
     }

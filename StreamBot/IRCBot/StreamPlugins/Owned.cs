@@ -11,18 +11,18 @@ namespace StreamBot.IRCBot.StreamPlugins
 
         public bool UseFor(Stream stream)
         {
-            return _regex.Match(stream.URL).Success;
+            return _regex.Match(stream.Url).Success;
         }
 
         private readonly Regex _linkId = new Regex(@"^.+/(?<id>\d+)/*$", RegexOptions.Compiled);
 
         public bool GetStatus(Stream stream)
         {
-            var m = _linkId.Match(stream.URL);
+            var m = _linkId.Match(stream.Url);
 
             if (!m.Success)
             {
-                throw new Exception("Invalid Owned link " + stream.URL);
+                throw new Exception("Invalid Owned link " + stream.Url);
             }
             
             var url = String.Format("http://api.own3d.tv/rest/live/status.xml?liveid={0}", m.Groups["id"].Value);

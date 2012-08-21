@@ -9,13 +9,13 @@ namespace StreamBot.IRCBot.StreamPlugins
 
         public bool UseFor(Stream stream)
         {
-            return _regex.Match(stream.URL).Success;
+            return _regex.Match(stream.Url).Success;
         }
 
         public bool GetStatus(Stream stream)
         {
             var web = new HtmlWeb();
-            var doc = web.Load(stream.URL);
+            var doc = web.Load(stream.Url);
             return doc.DocumentNode.SelectSingleNode("//span[@id='isLive']").InnerText == "true";
         }
     }
