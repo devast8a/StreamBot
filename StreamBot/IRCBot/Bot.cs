@@ -97,7 +97,6 @@ namespace StreamBot.IRCBot
             {
                 // Log this shit
                 Logger.AddErrorMessage(e.ToString());
-                Environment.Exit(1);
             }
 
             Logger.AddMessage("Connected! Joining channels");
@@ -124,7 +123,6 @@ namespace StreamBot.IRCBot
             catch (Exception e)
             {
                 Logger.AddErrorMessage(e.ToString());
-                Environment.Exit(2);
             }
         }
 
@@ -144,7 +142,6 @@ namespace StreamBot.IRCBot
         private void OnError(object sender, ErrorEventArgs e)
         {
             Logger.AddErrorMessage(e.ErrorMessage);
-            Environment.Exit(3);
         }
 
         private void OnQueryMessage(object sender, IrcEventArgs e)
