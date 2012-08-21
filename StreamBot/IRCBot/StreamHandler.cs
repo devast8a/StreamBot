@@ -26,7 +26,7 @@ namespace StreamBot.IRCBot
             {
                 new Livestream(),
                 new Owned(),
-                new Twitch(),
+                new Twitch()
             };
         }
 
