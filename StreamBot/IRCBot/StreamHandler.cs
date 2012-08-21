@@ -56,8 +56,8 @@ namespace StreamBot.IRCBot
 
             foreach (var stream in StreamList)
             {
-                Logger.AddMessage(string.Format("Checking {0}", stream.Name));
                 stream.Update(this);
+                Logger.AddMessage(string.Format("Checked {0} - {1}", stream.Name, stream.Online ? "Online" : "Offline"));
             }
 
             Logger.AddMessage("Stream checking done.");
@@ -76,6 +76,16 @@ namespace StreamBot.IRCBot
         public Stream GetStream(string streamName)
         {
             return StreamList.FirstOrDefault(x => x.Name.Equals(streamName, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public void StreamSubjectChange(Stream stream)
+        {
+            if(string.IsNullOrWhiteSpace(stream.Subject))
+            {
+                return;
+            }
+
+            _bot.SendMessage(string.Format("{0} - {1} - Is now streaming {2}", stream.Name, stream.URL, stream.Subject));
         }
     }
 }

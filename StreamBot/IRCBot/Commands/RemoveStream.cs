@@ -11,12 +11,13 @@ namespace StreamBot.IRCBot.Commands
             _settings = settings;
         }
 
-        public string Parse(string sender, Permission permission, string[] arguments)
+        public string Parse(string sender, Permission permission, CommandArgs args)
         {
-            if (arguments.Length == 2)
+            if (args.Args.Length == 1)
             {
-                var resp = _handler.StreamList.RemoveAll((x) => x.Name == arguments[1]) > 0 ? "Deleted " + arguments[1] : "No streamer exists by that name";
-                _settings.RemoveStream(arguments[1]);
+                var name = args.Args[0];
+                var resp = _handler.StreamList.RemoveAll((x) => x.Name == name) > 0 ? "Deleted " + name : "No streamer exists by that name";
+                _settings.RemoveStream(name);
                 return resp;
             }
 

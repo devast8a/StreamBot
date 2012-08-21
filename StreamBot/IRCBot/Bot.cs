@@ -8,6 +8,8 @@ namespace StreamBot.IRCBot
 {
     public class Bot
     {
+        public static string Version = "1.0";
+
         private readonly IrcClient _irc;
         private readonly CommandHandler _commandHandler;
         private readonly StreamHandler _streamHandler;
@@ -27,6 +29,8 @@ namespace StreamBot.IRCBot
             _irc = new IrcClient();
             _commandHandler = new CommandHandler();
             Settings = settings;
+
+            Logger.AddMessage("StreamBot Version " + Version);
 
             foreach (var stream in Settings.GetStreams())
             {
@@ -64,6 +68,8 @@ namespace StreamBot.IRCBot
                 new RemoveStream(_streamHandler, Settings)
                 ));
 
+            _commandHandler.Add("!streaming", new Streaming(_streamHandler));
+
             // Create a suspended stream-check timer
             _checkTimer = new Timer(StreamTimer, null,
                 TimeSpan.FromMilliseconds(-1),
@@ -72,11 +78,14 @@ namespace StreamBot.IRCBot
             // Setup permissions
             _channelOperatorPermission = new Permission() {Operator = true};
             _normalUserPermission = new Permission();
+
+            Logger.AddMessage("Bot loaded, ready to connect.");
         }
 
 
         public void Connect()
         {
+            Logger.AddMessage(string.Format("Connecting to: {0}:{1}", Settings.Server, Settings.Port));
             try
             {
                 _irc.Encoding = System.Text.Encoding.UTF8;
@@ -98,6 +107,8 @@ namespace StreamBot.IRCBot
                 // Log this shit
                 Logger.AddErrorMessage(e.ToString());
             }
+
+            Logger.AddMessage("Connected! Joining channels");
 
             try
             {
@@ -126,14 +137,21 @@ namespace StreamBot.IRCBot
 
         public void SendMessage(string message)
         {
-            foreach (var channel in Settings.GetPrimaryChannels())
+            try
             {
-                _irc.SendMessage(SendType.Message, channel, message);
-            }
+                foreach (var channel in Settings.GetPrimaryChannels())
+                {
+                    _irc.SendMessage(SendType.Message, channel, message);
+                }
 
-            foreach (var channel in Settings.GetSecondaryChannels())
+                foreach (var channel in Settings.GetSecondaryChannels())
+                {
+                    _irc.SendMessage(SendType.Message, channel, message);
+                }
+            }
+            catch (Exception exception)
             {
-                _irc.SendMessage(SendType.Message, channel, message);
+                Logger.AddErrorMessage("Fatal error while sending message to IRC: " + exception);
             }
         }
 
@@ -144,20 +162,27 @@ namespace StreamBot.IRCBot
 
         private void OnQueryMessage(object sender, IrcEventArgs e)
         {
-            Permission permission = _channelOperatorPermission;
-
-            // If there is no permission record associated with this hostname
-            // then treat this user as a normal user
-            if (Settings.GetPermission(e.Data.Host) == null)
+            try
             {
-                permission = _normalUserPermission;
+                Permission permission = _channelOperatorPermission;
+
+                // If there is no permission record associated with this hostname
+                // then treat this user as a normal user
+                if (Settings.GetPermission(e.Data.Host) == null)
+                {
+                    permission = _normalUserPermission;
+                }
+
+                string msg = _commandHandler.ParseCommand(e.Data.Nick, permission, e.Data.Message);
+
+                if (msg != null)
+                {
+                    _irc.SendMessage(SendType.Message, e.Data.Nick, msg);
+                }
             }
-
-            string msg = _commandHandler.ParseCommand(e.Data.Nick, permission, e.Data.Message);
-
-            if (msg != null)
+            catch (Exception exception)
             {
-                _irc.SendMessage(SendType.Message, e.Data.Nick, msg);
+                Logger.AddErrorMessage(exception.ToString());
             }
         }
 
@@ -183,11 +208,24 @@ namespace StreamBot.IRCBot
                 if (user.IsOp && Settings.GetPrimaryChannels().Any(
                     a => a.Equals(e.Data.Channel, StringComparison.OrdinalIgnoreCase)))
                 {
-                    permission = _channelOperatorPermission;
+                    if (user.IsOp &&
+                        Settings.GetPrimaryChannels().Any(
+                            a => a.Equals(e.Data.Channel, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        permission = _channelOperatorPermission;
+                    }
                 }
             }
 
-            string msg = _commandHandler.ParseCommand(e.Data.Nick, permission, e.Data.Message);
+            string msg = null;
+            try
+            {
+                msg = _commandHandler.ParseCommand(e.Data.Nick, permission, e.Data.Message);
+            }
+            catch (Exception ex)
+            {
+                Logger.AddErrorMessage(ex.Message);
+            }
 
             if (msg != null)
             {
@@ -197,7 +235,14 @@ namespace StreamBot.IRCBot
 
         private void StreamTimer(object sender)
         {
-            _streamHandler.UpdateStreams();
+            try
+            {
+                _streamHandler.UpdateStreams();
+            }
+            catch (Exception exception)
+            {
+                Logger.AddErrorMessage(exception.ToString());
+            }
         }
     }
 }
