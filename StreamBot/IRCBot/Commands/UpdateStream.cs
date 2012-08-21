@@ -1,7 +1,11 @@
+using log4net;
+
 namespace StreamBot.IRCBot.Commands
 {
     internal class UpdateStream : ICommand
     {
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(UpdateStream));
+
         private readonly StreamHandler _handler;
 
         public UpdateStream(StreamHandler handler)
@@ -37,7 +41,7 @@ namespace StreamBot.IRCBot.Commands
                 }
             }
 
-            _handler.Logger.AddMessage("Manual update for " + stream.Name);
+            Logger.Info("Manual update for " + stream.Name);
             stream.Update(_handler);
             return "Updating " + stream.Name;
         }

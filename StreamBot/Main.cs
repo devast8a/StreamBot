@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using StreamBot.IRCBot;
+using log4net.Config;
 
 namespace StreamBot
 {
@@ -17,6 +18,9 @@ namespace StreamBot
 
         public static void Main(string[] args)
         {
+            // Configure log4net from app.config
+            XmlConfigurator.Configure();
+
             var settings = new SettingsFile("Settings.xml");
 
             Console.WriteLine("Press <ENTER> to quit.");

@@ -4,11 +4,14 @@ using System.Reflection;
 using System.Threading;
 using Meebey.SmartIrc4net;
 using StreamBot.IRCBot.Commands;
+using log4net;
 
 namespace StreamBot.IRCBot
 {
     internal class Bot
     {
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(Bot));
+
         private readonly IrcClient _irc;
         private readonly CommandHandler _commandHandler;
         private readonly StreamHandler _streamHandler;
@@ -19,17 +22,15 @@ namespace StreamBot.IRCBot
         private readonly Timer _checkTimer;
 
         private readonly SettingsInstance _settings;
-        public Log Logger;
 
         public Bot(SettingsInstance settings)
         {
-            Logger = new Log();
             _streamHandler = new StreamHandler(this);
             _irc = new IrcClient();
             _commandHandler = new CommandHandler();
             _settings = settings;
 
-            Logger.AddMessage("StreamBot Version " + Assembly.GetCallingAssembly().GetName().Version);
+            Logger.Info("StreamBot Version " + Assembly.GetCallingAssembly().GetName().Version);
 
             foreach (var stream in _settings.GetStreams())
             {
@@ -82,13 +83,13 @@ namespace StreamBot.IRCBot
             _channelOperatorPermission = new Permission(String.Empty, true, false);
             _normalUserPermission = new Permission(String.Empty, false, false);
 
-            Logger.AddMessage("Bot loaded, ready to connect.");
+            Logger.Info("Bot loaded, ready to connect.");
         }
 
 
         public void Connect()
         {
-            Logger.AddMessage(string.Format("Connecting to: {0}:{1}", _settings.Server, _settings.Port));
+            Logger.Info(string.Format("Connecting to: {0}:{1}", _settings.Server, _settings.Port));
             try
             {
                 _irc.Encoding = System.Text.Encoding.UTF8;
@@ -108,10 +109,10 @@ namespace StreamBot.IRCBot
             catch (Exception e)
             {
                 // Log this shit
-                Logger.AddErrorMessage(e.ToString());
+                Logger.Error(e.ToString());
             }
 
-            Logger.AddMessage("Connected! Joining channels");
+            Logger.Info("Connected! Joining channels");
 
             try
             {
@@ -134,7 +135,7 @@ namespace StreamBot.IRCBot
             }
             catch (Exception e)
             {
-                Logger.AddErrorMessage(e.ToString());
+                Logger.Error(e.ToString());
             }
         }
 
@@ -149,13 +150,13 @@ namespace StreamBot.IRCBot
             }
             catch (Exception exception)
             {
-                Logger.AddErrorMessage("Fatal error while sending message to IRC: " + exception);
+                Logger.Error("Fatal error while sending message to IRC: " + exception);
             }
         }
 
         private void OnError(object sender, ErrorEventArgs e)
         {
-            Logger.AddErrorMessage(e.ErrorMessage);
+            Logger.Error(e.ErrorMessage);
         }
 
         private void OnQueryMessage(object sender, IrcEventArgs e)
@@ -180,7 +181,7 @@ namespace StreamBot.IRCBot
             }
             catch (Exception exception)
             {
-                Logger.AddErrorMessage(exception.ToString());
+                Logger.Error(exception.ToString());
             }
         }
 
@@ -222,7 +223,7 @@ namespace StreamBot.IRCBot
             }
             catch (Exception ex)
             {
-                Logger.AddErrorMessage(ex.Message);
+                Logger.Error(ex.Message);
             }
 
             if (msg != null)
@@ -239,7 +240,7 @@ namespace StreamBot.IRCBot
             }
             catch (Exception exception)
             {
-                Logger.AddErrorMessage(exception.ToString());
+                Logger.Error(exception.ToString());
             }
         }
     }

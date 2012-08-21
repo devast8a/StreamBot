@@ -2,21 +2,21 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using StreamBot.IRCBot.StreamPlugins;
+using log4net;
 
 namespace StreamBot.IRCBot
 {
     internal class StreamHandler
     {
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(StreamHandler));
+
         private readonly Bot _bot;
         private readonly IStreamPlugin[] _streamPlugins;
         private readonly List<Stream> _streams;
 
-        public Log Logger;
-
         public StreamHandler(Bot bot)
         {
             _bot = bot;
-            Logger = bot.Logger;
             _streams = new List<Stream>();
 
             _streamPlugins = new IStreamPlugin[]
@@ -55,15 +55,15 @@ namespace StreamBot.IRCBot
 
         public void UpdateStreams()
         {
-            Logger.AddMessage(string.Format("Checking {0} streams.", _streams.Count));
+            Logger.Info(string.Format("Checking {0} streams.", _streams.Count));
 
             foreach (var stream in _streams)
             {
                 stream.Update(this);
-                Logger.AddMessage(string.Format("Checked {0} - {1}", stream.Name, stream.Online ? "Online" : "Offline"));
+                Logger.Info(string.Format("Checked {0} - {1}", stream.Name, stream.Online ? "Online" : "Offline"));
             }
 
-            Logger.AddMessage("Stream checking done.");
+            Logger.Info("Stream checking done.");
         }
 
         public void NewOfflineStream(Stream stream)

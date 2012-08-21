@@ -34,6 +34,9 @@
     <Reference Include="HtmlAgilityPack">
       <HintPath>..\libs\HtmlAgilityPack.dll</HintPath>
     </Reference>
+    <Reference Include="log4net">
+      <HintPath>..\libs\log4net.dll</HintPath>
+    </Reference>
     <Reference Include="SmartIRC4Net">
       <HintPath>..\libs\SmartIRC4Net.dll</HintPath>
     </Reference>
@@ -65,11 +68,12 @@
     <Compile Include="IRCBot\CommandHandler.cs" />
     <Compile Include="IRCBot\StreamPlugins\Twitch.cs" />
     <Compile Include="IRCBot\StreamPlugins\Owned.cs" />
-    <Compile Include="IRCBot\Log.cs" />
     <Compile Include="IRCBot\SettingsFile.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>
       <Properties>
