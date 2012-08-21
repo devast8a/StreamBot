@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using StreamBot.IRCBot.StreamPlugins;
 
@@ -12,7 +13,6 @@ namespace StreamBot.IRCBot
         private readonly IStreamPlugin[] _streamPlugins;
 
         public Log Logger;
-        public List<Stream> OnlineStreams;
         public readonly List<Stream> StreamList;
 
         public StreamHandler(Bot bot)
@@ -20,7 +20,6 @@ namespace StreamBot.IRCBot
             _bot = bot;
             Logger = bot.Logger;
             StreamList = new List<Stream>();
-            OnlineStreams = new List<Stream>();
 
             _streamPlugins = new IStreamPlugin[]
             {
