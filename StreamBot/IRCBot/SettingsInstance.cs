@@ -81,6 +81,11 @@ namespace StreamBot.IRCBot
             return channels.Elements("SecondaryChannel").Select(chan => (string)chan.Attribute("Name"));
         }
 
+        public IEnumerable<string> GetAllChannels()
+        {
+            return GetPrimaryChannels().Union(GetSecondaryChannels());
+        }
+
         public IEnumerable<Stream> GetStreams()
         {
             var streams = EnsureExists("Streams");
