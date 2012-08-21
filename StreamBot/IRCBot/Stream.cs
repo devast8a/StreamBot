@@ -15,7 +15,7 @@ namespace StreamBot.IRCBot
         {
             try
             {
-                if(Plugin == null)
+                if (Plugin == null)
                 {
                     return;
                 }
@@ -27,16 +27,17 @@ namespace StreamBot.IRCBot
                         handler.NewOnlineStream(this);
                     }
                     Online = true;
-                }else
+                }
+                else
                 {
-                    if(Online)
+                    if (Online)
                     {
                         handler.NewOfflineStream(this);
                     }
                     Online = false;
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 if (Online)
                 {
@@ -49,4 +50,3 @@ namespace StreamBot.IRCBot
         }
     }
 }
-
