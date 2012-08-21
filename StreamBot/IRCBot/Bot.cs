@@ -182,9 +182,9 @@ namespace StreamBot.IRCBot
         private MessageSource GetMessageSource(IrcEventArgs e)
         {
             // Get the permission for this hostname
-            var permission = _settings.GetUserPermission(e.Data.Host) ?? Permission.NormalUser;
+            var permission = _settings.GetUserPermission(e.Data.Host);
 
-            if (string.IsNullOrWhiteSpace(e.Data.Channel))
+            if (permission != null && string.IsNullOrWhiteSpace(e.Data.Channel))
             {
                 var user = _irc.GetChannelUser(e.Data.Channel, e.Data.Nick);
                 // If there's no permission record, see if he's an op on a primary channel
@@ -200,7 +200,7 @@ namespace StreamBot.IRCBot
                 }
             }
 
-            return new MessageSource(e.Data.Host, e.Data.Nick, permission);
+            return new MessageSource(e.Data.Host, e.Data.Nick, permission ?? Permission.NormalUser);
         }
 
         private void OnChannelMessage(object sender, IrcEventArgs e)
