@@ -137,14 +137,21 @@ namespace StreamBot.IRCBot
 
         public void SendMessage(string message)
         {
-            foreach (var channel in Settings.GetPrimaryChannels())
+            try
             {
-                _irc.SendMessage(SendType.Message, channel, message);
-            }
+                foreach (var channel in Settings.GetPrimaryChannels())
+                {
+                    _irc.SendMessage(SendType.Message, channel, message);
+                }
 
-            foreach (var channel in Settings.GetSecondaryChannels())
+                foreach (var channel in Settings.GetSecondaryChannels())
+                {
+                    _irc.SendMessage(SendType.Message, channel, message);
+                }
+            }
+            catch(Exception exception)
             {
-                _irc.SendMessage(SendType.Message, channel, message);
+                Logger.AddErrorMessage("Fatal error while sending message to IRC: " + exception);
             }
         }
 
@@ -155,51 +162,71 @@ namespace StreamBot.IRCBot
 
         private void OnQueryMessage(object sender, IrcEventArgs e)
         {
-            Permission permission = _channelOperatorPermission;
+            try{
+                Permission permission = _channelOperatorPermission;
 
-            // If there is no permission record associated with this hostname
-            // then treat this user as a normal user
-            if (Settings.GetPermission(e.Data.Host) == null)
-            {
-                permission = _normalUserPermission;
+                // If there is no permission record associated with this hostname
+                // then treat this user as a normal user
+                if (Settings.GetPermission(e.Data.Host) == null)
+                {
+                    permission = _normalUserPermission;
+                }
+
+                string msg = _commandHandler.ParseCommand(e.Data.Nick, permission, e.Data.Message);
+
+                if (msg != null)
+                {
+                    _irc.SendMessage(SendType.Message, e.Data.Nick, msg);
+                }
             }
-
-            string msg = _commandHandler.ParseCommand(e.Data.Nick, permission, e.Data.Message);
-
-            if (msg != null)
+            catch (Exception exception)
             {
-                _irc.SendMessage(SendType.Message, e.Data.Nick, msg);
+                Logger.AddErrorMessage(exception.ToString());
             }
         }
 
         private void OnChannelMessage(object sender, IrcEventArgs e)
         {
-            var user = _irc.GetChannelUser(e.Data.Channel, e.Data.Nick);
-
-            Permission permission = _normalUserPermission;
-            
-            // If there is no permission record associated with this hostname
-            // see if he's an op on a primary channel
-            if (Settings.GetPermission(e.Data.Host) != null)
+            try
             {
-                if (user.IsOp &&
-                    Settings.GetPrimaryChannels().Any(a => a.Equals(e.Data.Channel, StringComparison.OrdinalIgnoreCase)))
+                var user = _irc.GetChannelUser(e.Data.Channel, e.Data.Nick);
+
+                Permission permission = _normalUserPermission;
+
+                // If there is no permission record associated with this hostname
+                // see if he's an op on a primary channel
+                if (Settings.GetPermission(e.Data.Host) != null)
                 {
-                    permission = _channelOperatorPermission;
+                    if (user.IsOp &&
+                        Settings.GetPrimaryChannels().Any(a => a.Equals(e.Data.Channel, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        permission = _channelOperatorPermission;
+                    }
+                }
+
+                string msg = _commandHandler.ParseCommand(e.Data.Nick, permission, e.Data.Message);
+
+                if (msg != null)
+                {
+                    _irc.SendMessage(SendType.Message, e.Data.Channel, string.Format("{0}: {1}", e.Data.Nick, msg));
                 }
             }
-
-            string msg = _commandHandler.ParseCommand(e.Data.Nick, permission, e.Data.Message);
-
-            if (msg != null)
+            catch (Exception exception)
             {
-                _irc.SendMessage(SendType.Message, e.Data.Channel, string.Format("{0}: {1}", e.Data.Nick, msg));
+                Logger.AddErrorMessage(exception.ToString());
             }
         }
 
         private void StreamTimer(object sender)
         {
-            _streamHandler.UpdateStreams();
+            try
+            {
+                _streamHandler.UpdateStreams();
+            }
+            catch (Exception exception)
+            {
+                Logger.AddErrorMessage(exception.ToString());
+            }
         }
     }
 }
