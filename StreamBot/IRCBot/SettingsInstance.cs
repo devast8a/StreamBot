@@ -32,7 +32,7 @@ namespace StreamBot.IRCBot
             elem.Add(new XAttribute("Hostname", name));
         }
 
-        public void RemoveUserPermission(string host)
+        public bool RemoveUserPermission(string host)
         {
             var permissions = EnsureExists("Permissions");
 
@@ -41,7 +41,10 @@ namespace StreamBot.IRCBot
             if(target != null)
             {
                 target.Remove();
+                return true;
             }
+
+            return false;
         }
 
         public Permission GetUserPermission(string host)
