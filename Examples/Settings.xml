@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Settings>
+  <Instances>
+    <!-- Connect to irc.freenode.net and check for stream updates every 3 minutes -->
+    <Instance Server="irc.freenode.net" Port="6667" Nickname="StreamBot" Period="P0DT0H3M0S">
+      <!-- Connect to irc.freenode.net and check for stream updates every 3 minutes -->
+      <Permissions>
+        <!-- Supported types of operators are SuperOperator and Operator. Primary
+             channel IRC operators do not need to be listed here. -->
+        <SuperOperator Hostname="unaffiliated/administrator" />
+      </Permissions>
+
+      <!-- List of channels to broadcast stream statuses on -->
+      <Channels>
+        <PrimaryChannel Name="#livestreams" />
+        <SecondaryChannel Name="#anotherchannel" />
+      </Channels>
+
+      <!-- List of streams to monitor. Supported sites are: Twitch, Livestream, Own3d -->
+      <Streams>
+        <Streamer Nickname="SomeUser" Location="http://twitch.tv/someone" />
+        <Streamer Nickname="AnotherUser" Location="http://livestream.com/username123" />
+      </Streams>
+    </Instance>
+  </Instances>
+</Settings>
