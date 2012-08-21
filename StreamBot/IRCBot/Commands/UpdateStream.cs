@@ -13,7 +13,7 @@ namespace StreamBot.IRCBot.Commands
         {
             Stream stream;
 
-            if(args.Args.Length != 0)
+            if(args.Args.Count != 0)
             {
                 if(!permission.Operator)
                 {

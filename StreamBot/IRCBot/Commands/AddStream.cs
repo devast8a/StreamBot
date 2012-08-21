@@ -16,7 +16,7 @@ namespace StreamBot.IRCBot.Commands
 
         public string Parse(string sender, Permission permission, CommandArgs args)
         {
-            if(args.Args.Length != 2)
+            if(args.Args.Count != 2)
             {
                 return String.Format("Error - Usage {0} <stream-name> <stream-url>", args.Name);
             }

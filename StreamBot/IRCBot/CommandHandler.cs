@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using StreamBot.IRCBot.Commands;
 
@@ -16,19 +17,17 @@ namespace StreamBot.IRCBot
         {
             int firstSpace = message.IndexOf(' ');
 
-            var args = new CommandArgs();
+            CommandArgs args;
 
             if (firstSpace == -1)
             {
-                args.Name = message;
-                args.Full = "";
-                args.Args = new string[0];
+                // TODO: Revisit this new string[0] thing; preferrably should pass null or something
+                args = new CommandArgs(message, new string[0], String.Empty);
             }
             else
             {
-                args.Name = message.Substring(0, firstSpace);
-                args.Full = message.Substring(firstSpace + 1).Trim();
-                args.Args = args.Full.Split(' ');
+                string full = message.Substring(firstSpace + 1).Trim();
+                args = new CommandArgs(message.Substring(0, firstSpace), full.Split(), full);
             }
 
             ICommand command;

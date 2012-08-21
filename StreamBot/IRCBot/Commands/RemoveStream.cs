@@ -13,7 +13,7 @@ namespace StreamBot.IRCBot.Commands
 
         public string Parse(string sender, Permission permission, CommandArgs args)
         {
-            if (args.Args.Length == 1)
+            if (args.Args.Count == 1)
             {
                 var name = args.Args[0];
                 var resp = _handler.StreamList.RemoveAll(x => x.Name == name) > 0 ? "Deleted " + name : "No streamer exists by that name";
