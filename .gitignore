@@ -110,3 +110,4 @@ UpgradeLog*.XML
 *.pidb
 *.resources
 test-results/
+libs/*
