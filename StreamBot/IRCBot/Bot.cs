@@ -122,7 +122,7 @@ namespace StreamBot.IRCBot
                     _irc.SendMessage(SendType.Message, "NickServ", "identify " + Settings.Password);
                 }
 
-                foreach (var channel in Settings.GetPrimaryChannels().Union(Settings.GetSecondaryChannels()))
+                foreach (var channel in Settings.GetAllChannels())
                 {
                     _irc.RfcJoin(channel);
                 }
