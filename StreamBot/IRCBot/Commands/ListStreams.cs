@@ -20,7 +20,7 @@ namespace StreamBot.IRCBot.Commands
 
         public string Parse(string sender, Permission permission, CommandArgs args)
         {
-            var ret = string.Join(", ", _handler.StreamList.Where(_predicate).Select(x => x.Name));
+            var ret = string.Join(", ", _handler.Matching(_predicate).Select(x => x.Name));
 
             if(string.IsNullOrWhiteSpace(ret))
             {

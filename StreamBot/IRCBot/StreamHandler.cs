@@ -9,17 +9,16 @@ namespace StreamBot.IRCBot
     internal class StreamHandler
     {
         private readonly Bot _bot;
-
         private readonly IStreamPlugin[] _streamPlugins;
+        private readonly List<Stream> _streams;
 
         public Log Logger;
-        public readonly List<Stream> StreamList;
 
         public StreamHandler(Bot bot)
         {
             _bot = bot;
             Logger = bot.Logger;
-            StreamList = new List<Stream>();
+            _streams = new List<Stream>();
 
             _streamPlugins = new IStreamPlugin[]
             {
@@ -29,27 +28,37 @@ namespace StreamBot.IRCBot
             };
         }
 
+        public int RemoveAll(Predicate<Stream> predicate)
+        {
+            return _streams.RemoveAll(predicate);
+        }
+
+        public IEnumerable<Stream> Matching(Func<Stream, bool> predicate)
+        {
+            return _streams.Where(predicate);
+        }
+
         public bool AddStream(string name, string url)
         {
             var stream = new Stream(name, url);
 
             stream.Plugin = _streamPlugins.FirstOrDefault(x => x.UseFor(stream));
 
-            StreamList.Add(stream);
+            _streams.Add(stream);
 
             return stream.Plugin != null;
         }
 
         public bool StreamExists(string name)
         {
-            return StreamList.Any(stream => stream.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+            return _streams.Any(stream => stream.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
         }
 
         public void UpdateStreams()
         {
-            Logger.AddMessage(string.Format("Checking {0} streams.", StreamList.Count));
+            Logger.AddMessage(string.Format("Checking {0} streams.", _streams.Count));
 
-            foreach (var stream in StreamList)
+            foreach (var stream in _streams)
             {
                 stream.Update(this);
                 Logger.AddMessage(string.Format("Checked {0} - {1}", stream.Name, stream.Online ? "Online" : "Offline"));
@@ -70,7 +79,7 @@ namespace StreamBot.IRCBot
 
         public Stream GetStream(string streamName)
         {
-            return StreamList.FirstOrDefault(x => x.Name.Equals(streamName, StringComparison.OrdinalIgnoreCase));
+            return _streams.FirstOrDefault(x => x.Name.Equals(streamName, StringComparison.OrdinalIgnoreCase));
         }
 
         public void StreamSubjectChange(Stream stream)

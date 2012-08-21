@@ -26,14 +26,14 @@ namespace StreamBot.IRCBot.Commands
 
             _handler.Logger.AddMessage(string.Format("{0} is adding a new stream. {1} - {2}", sender, name, url));
 
-            if(_handler.StreamList.Any(x => x.Name == name)){
+            if(_handler.GetStream(name) != null) {
                 return "Error - A streamer already exists with that name";
             }
 
             if( !_handler.AddStream(name, url) )
             {
                 // Yeah yeah, it's hacky.
-                _handler.StreamList.RemoveAll(x => x.Name == name);
+                _handler.RemoveAll(a => a.Name == name);
 
                 return "Error - The URL provided can not be handled by any stream plugins.";
             }
