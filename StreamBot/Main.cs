@@ -4,7 +4,7 @@ using StreamBot.IRCBot;
 
 namespace StreamBot
 {
-    internal class MainClass
+    internal class Program
     {
         private static readonly TimeSpan SaveInterval = TimeSpan.FromSeconds(300);
         private static readonly Timer SettingsTimer = new Timer(SaveSettings, SettingsTimer, SaveInterval, SaveInterval);
