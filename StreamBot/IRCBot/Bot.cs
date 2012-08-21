@@ -138,7 +138,7 @@ namespace StreamBot.IRCBot
             }
         }
 
-        public void SendMessage(string message)
+        public void BroadcastMessage(string message)
         {
             try
             {
