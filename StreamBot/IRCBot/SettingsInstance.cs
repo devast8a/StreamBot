@@ -36,22 +36,12 @@ namespace StreamBot.IRCBot
 
             foreach (var so in permissions.Elements("SuperOperator"))
             {
-                yield return new Permission
-                {
-                    Name = (string)so.Attribute("Hostname"),
-                    Operator = true,
-                    SuperOperator = true,
-                };
+                yield return new Permission((string)so.Attribute("Hostname"), true, true);
             }
 
             foreach (var so in permissions.Elements("Operator"))
             {
-                yield return new Permission
-                {
-                    Name = (string)so.Attribute("Hostname"),
-                    Operator = true,
-                    SuperOperator = false,
-                };
+                yield return new Permission((string)so.Attribute("Hostname"), true, false);
             }
         }
 
