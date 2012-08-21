@@ -16,9 +16,6 @@ namespace StreamBot.IRCBot
         private readonly CommandHandler _commandHandler;
         private readonly StreamHandler _streamHandler;
 
-        private readonly Permission _channelOperatorPermission;
-        private readonly Permission _normalUserPermission;
-
         private readonly Timer _checkTimer;
 
         private readonly SettingsInstance _settings;
@@ -60,31 +57,32 @@ namespace StreamBot.IRCBot
                 "A step by step guide on how to set up your own stream can be found here: " +
                 "http://vidyadev.com/wiki/A_guide_to_streaming"));
 
-            _commandHandler.Add("!addstream", new SecureCommand(x => x.IsOperator,
+            _commandHandler.Add("!addstream", new SecureCommand(x => x.Permission.IsOperator,
                 new AddStream(_streamHandler, _settings)
                 ));
 
             _commandHandler.Add("!version", new Respond(Assembly.GetCallingAssembly().GetName().Version.ToString()));
 
-            _commandHandler.Add("!remstream", new SecureCommand(x => x.IsOperator,
-                new RemoveStream(_streamHandler, _settings)
+            _commandHandler.Add("!delstream", new SecureCommand(x => x.Permission.IsOperator,
+                new DelStream(_streamHandler, _settings)
                 ));
 
             _commandHandler.Add("!streaming", new Streaming(_streamHandler));
 
             _commandHandler.Add("!update", new UpdateStream(_streamHandler));
 
-            _commandHandler.Add("!addop", new AddOp(_settings));
-            _commandHandler.Add("!delop", new DelOp(_settings));
+            _commandHandler.Add("!addperm", new SecureCommand(x => x.Permission.IsSuperOperator,
+                new AddPerm(_settings)
+                ));
+
+            _commandHandler.Add("!delperm", new SecureCommand(x => x.Permission.IsSuperOperator,
+                new DelPerm(_settings)
+                ));
 
             // Create a suspended stream-check timer
             _checkTimer = new Timer(StreamTimer, null,
                 TimeSpan.FromMilliseconds(-1),
                 TimeSpan.FromMilliseconds(-1));
-
-            // Setup permissions
-            _channelOperatorPermission = new Permission(String.Empty, true, false);
-            _normalUserPermission = new Permission(String.Empty, false, false);
 
             Logger.Info("Bot loaded, ready to connect.");
         }
@@ -166,18 +164,9 @@ namespace StreamBot.IRCBot
         {
             try
             {
-                Permission permission = _channelOperatorPermission;
-
-                // If there is no permission record associated with this hostname
-                // then treat this user as a normal user
-                if (_settings.GetPermission(e.Data.Host) == null)
-                {
-                    permission = _normalUserPermission;
-                }
-
                 string msg = _commandHandler.ParseCommand(
-                    new MessageSource(e.Data.Host, e.Data.Nick), 
-                    permission, e.Data.Message);
+                    () => GetMessageSource(e),
+                    e.Data.Message);
 
                 if (msg != null)
                 {
@@ -186,28 +175,18 @@ namespace StreamBot.IRCBot
             }
             catch (Exception exception)
             {
-                Logger.Error(exception.ToString());
+                Logger.Error(exception);
             }
         }
 
-        private void OnChannelMessage(object sender, IrcEventArgs e)
+        private MessageSource GetMessageSource(IrcEventArgs e)
         {
-            var user = _irc.GetChannelUser(e.Data.Channel, e.Data.Nick);
-
-            Permission permission = _normalUserPermission;
-
             // Get the permission for this hostname
-            var hostPermission = _settings.GetPermission(e.Data.Host);
+            var permission = _settings.GetUserPermission(e.Data.Host) ?? Permission.NormalUser;
 
-            // If there's a permission record for this user, he's an op
-            if (hostPermission != null)
+            if (string.IsNullOrWhiteSpace(e.Data.Channel))
             {
-                // TODO: In the future we may need to distinguish between super op/channel op
-                // hostPermission.Value has this information but it is not currently used.
-                permission = _channelOperatorPermission;
-            }
-            else
-            {
+                var user = _irc.GetChannelUser(e.Data.Channel, e.Data.Nick);
                 // If there's no permission record, see if he's an op on a primary channel
                 if (user.IsOp && _settings.GetPrimaryChannels().Any(
                     a => a.Equals(e.Data.Channel, StringComparison.OrdinalIgnoreCase)))
@@ -216,21 +195,27 @@ namespace StreamBot.IRCBot
                         _settings.GetPrimaryChannels().Any(
                             a => a.Equals(e.Data.Channel, StringComparison.OrdinalIgnoreCase)))
                     {
-                        permission = _channelOperatorPermission;
+                        permission = Permission.ChannelOperator;
                     }
                 }
             }
 
+            return new MessageSource(e.Data.Host, e.Data.Nick, permission);
+        }
+
+        private void OnChannelMessage(object sender, IrcEventArgs e)
+        {
             string msg = null;
+
             try
             {
                 msg = _commandHandler.ParseCommand(
-                    new MessageSource(e.Data.Host, e.Data.Nick), 
-                    permission, e.Data.Message);
+                    () => GetMessageSource(e),
+                    e.Data.Message);
             }
             catch (Exception ex)
             {
-                Logger.Error(ex.Message);
+                Logger.Error(ex);
             }
 
             if (msg != null)

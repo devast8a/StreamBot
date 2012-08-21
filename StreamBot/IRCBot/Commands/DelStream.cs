@@ -1,17 +1,17 @@
 namespace StreamBot.IRCBot.Commands
 {
-    internal class RemoveStream : ICommand
+    internal class DelStream : ICommand
     {
         readonly StreamHandler _handler;
         private readonly SettingsInstance _settings;
 
-        public RemoveStream(StreamHandler handler, SettingsInstance settings)
+        public DelStream(StreamHandler handler, SettingsInstance settings)
         {
             _handler=handler;
             _settings = settings;
         }
 
-        public string Parse(MessageSource sender, Permission permission, CommandArgs args)
+        public string Parse(MessageSource sender, CommandArgs args)
         {
             if (args.Args.Count == 1)
             {
@@ -21,7 +21,7 @@ namespace StreamBot.IRCBot.Commands
                 return resp;
             }
 
-            return "Error - Usage !remstream <streamer-name>";
+            return string.Format("Error - Usage {0} <streamer-name>", args.Name);
         }
     }
 }

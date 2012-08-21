@@ -13,7 +13,7 @@ namespace StreamBot.IRCBot
             _commands.Add(text, command);
         }
 
-        public string ParseCommand(MessageSource sender, Permission permission, string message)
+        public string ParseCommand(Func<MessageSource> sender, string message)
         {
             int firstSpace = message.IndexOf(' ');
 
@@ -34,7 +34,7 @@ namespace StreamBot.IRCBot
 
             if (_commands.TryGetValue(args.Name, out command))
             {
-                return command.Parse(sender, permission, args);
+                return command.Parse(sender(), args);
             }
 
             return null;

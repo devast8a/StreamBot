@@ -16,7 +16,7 @@ namespace StreamBot.IRCBot.Commands
             _settings = settings;
         }
 
-        public string Parse(MessageSource sender, Permission permission, CommandArgs args)
+        public string Parse(MessageSource sender, CommandArgs args)
         {
             if(args.Args.Count != 2)
             {

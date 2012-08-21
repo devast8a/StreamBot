@@ -18,7 +18,7 @@ namespace StreamBot.IRCBot.Commands
             _predicate=predicate;
         }
 
-        public string Parse(MessageSource sender, Permission permission, CommandArgs args)
+        public string Parse(MessageSource sender, CommandArgs args)
         {
             var ret = string.Join(", ", _handler.Matching(_predicate).Select(x => x.Name));
 

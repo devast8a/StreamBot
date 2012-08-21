@@ -13,13 +13,13 @@ namespace StreamBot.IRCBot.Commands
             _handler=handler;
         }
 
-        public string Parse(MessageSource sender, Permission permission, CommandArgs args)
+        public string Parse(MessageSource sender, CommandArgs args)
         {
             Stream stream;
 
             if(args.Args.Count != 0)
             {
-                if(!permission.IsOperator)
+                if(!sender.Permission.IsOperator)
                 {
                     return string.Format("Error - usage {0}. Operators may force updates of other streamers", args.Name);
                 }

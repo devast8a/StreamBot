@@ -5,12 +5,6 @@ using System.Xml.Linq;
 
 namespace StreamBot.IRCBot
 {
-    internal enum PermissionType
-    {
-        Operator,
-        SuperOperator,
-    }
-
     internal class SettingsInstance
     {
         private readonly XElement _source;
@@ -30,58 +24,35 @@ namespace StreamBot.IRCBot
             Period = (TimeSpan?)_source.Attribute("Period") ?? TimeSpan.FromSeconds(180);
         }
 
-        public IEnumerable<Permission> GetPermissions()
+        public void AddUserPermission(string name, Permission type)
         {
             var permissions = EnsureExists("Permissions");
-
-            foreach (var so in permissions.Elements("IsSuperOperator"))
-            {
-                yield return new Permission((string)so.Attribute("Hostname"), true, true);
-            }
-
-            foreach (var so in permissions.Elements("IsOperator"))
-            {
-                yield return new Permission((string)so.Attribute("Hostname"), true, false);
-            }
+            var elem = new XElement(type.Name);
+            permissions.Add(elem);
+            elem.Add(new XAttribute("Hostname", name));
         }
 
-        public void AddPermission(string name, PermissionType type)
-        {
-            var permissions = EnsureExists("Permissions");
-            permissions.Add(
-                new XElement(Enum.GetName(typeof(PermissionType), type),
-                new XAttribute("Hostname", name)));
-        }
-
-        public void RemovePermission(string host)
+        public void RemoveUserPermission(string host)
         {
             var permissions = EnsureExists("Permissions");
 
-            foreach (var type in Enum.GetValues(typeof(PermissionType)))
+            var target = permissions.Elements().FirstOrDefault(x => ((string)x.Attribute("Hostname")).Equals(host, StringComparison.OrdinalIgnoreCase));
+
+            if(target != null)
             {
-                var target = permissions.Elements(
-                    Enum.GetName(typeof(PermissionType), type))
-                    .FirstOrDefault(
-                        a => ((string)a.Attribute("Hostname")).Equals(host, StringComparison.OrdinalIgnoreCase));
-                if (target != null)
-                {
-                    target.Remove();
-                    return;
-                }
+                target.Remove();
             }
         }
 
-        public PermissionType? GetPermission(string host)
+        public Permission GetUserPermission(string host)
         {
             var permissions = EnsureExists("Permissions");
 
-            foreach (var type in Enum.GetValues(typeof(PermissionType)))
+            var target = permissions.Elements().FirstOrDefault(x => ((string)x.Attribute("Hostname")).Equals(host, StringComparison.OrdinalIgnoreCase));
+
+            if(target != null)
             {
-                var target = permissions.Elements(
-                    Enum.GetName(typeof(PermissionType), type))
-                    .FirstOrDefault(
-                        a => ((string)a.Attribute("Hostname")).Equals(host, StringComparison.OrdinalIgnoreCase));
-                if (target != null) return (PermissionType)type;
+                return Permission.GetPermission(target.Name.LocalName);
             }
 
             return null;
