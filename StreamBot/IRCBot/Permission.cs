@@ -38,6 +38,6 @@ namespace StreamBot.IRCBot
         }
 
         public static Permission ChannelOperator = new Permission("ChannelOperator", true, false);
-        public static Permission NormalUser = new Permission("NormalUser", true, false);
+        public static Permission NormalUser = new Permission("NormalUser", false, false);
     }
 }
