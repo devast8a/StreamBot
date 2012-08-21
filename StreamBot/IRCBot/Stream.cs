@@ -3,16 +3,6 @@ using StreamBot.IRCBot.StreamPlugins;
 
 namespace StreamBot.IRCBot
 {
-    public enum StreamStatus
-    {
-        // Offline
-        Offline,
-        // Online now, but was offline last tick
-        NowOnline,
-        // Online now, and was online last tick
-        StillOnline,
-    }
-
     public class Stream
     {
         public string Name;
@@ -25,7 +15,7 @@ namespace StreamBot.IRCBot
         {
             try
             {
-                if(Plugin == null)
+                if (Plugin == null)
                 {
                     return;
                 }
@@ -37,16 +27,17 @@ namespace StreamBot.IRCBot
                         handler.NewOnlineStream(this);
                     }
                     Online = true;
-                }else
+                }
+                else
                 {
-                    if(Online)
+                    if (Online)
                     {
                         handler.NewOfflineStream(this);
                     }
                     Online = false;
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 if (Online)
                 {
@@ -59,4 +50,3 @@ namespace StreamBot.IRCBot
         }
     }
 }
-

@@ -149,7 +149,7 @@ namespace StreamBot.IRCBot
                     _irc.SendMessage(SendType.Message, channel, message);
                 }
             }
-            catch(Exception exception)
+            catch (Exception exception)
             {
                 Logger.AddErrorMessage("Fatal error while sending message to IRC: " + exception);
             }
@@ -162,7 +162,8 @@ namespace StreamBot.IRCBot
 
         private void OnQueryMessage(object sender, IrcEventArgs e)
         {
-            try{
+            try
+            {
                 Permission permission = _channelOperatorPermission;
 
                 // If there is no permission record associated with this hostname
@@ -187,33 +188,48 @@ namespace StreamBot.IRCBot
 
         private void OnChannelMessage(object sender, IrcEventArgs e)
         {
-            try
+            var user = _irc.GetChannelUser(e.Data.Channel, e.Data.Nick);
+
+            Permission permission = _normalUserPermission;
+
+            // Get the permission for this hostname
+            var hostPermission = Settings.GetPermission(e.Data.Host);
+
+            // If there's a permission record for this user, he's an op
+            if (hostPermission != null)
             {
-                var user = _irc.GetChannelUser(e.Data.Channel, e.Data.Nick);
-
-                Permission permission = _normalUserPermission;
-
-                // If there is no permission record associated with this hostname
-                // see if he's an op on a primary channel
-                if (Settings.GetPermission(e.Data.Host) != null)
+                // TODO: In the future we may need to distinguish between super op/channel op
+                // hostPermission.Value has this information but it is not currently used.
+                permission = _channelOperatorPermission;
+            }
+            else
+            {
+                // If there's no permission record, see if he's an op on a primary channel
+                if (user.IsOp && Settings.GetPrimaryChannels().Any(
+                    a => a.Equals(e.Data.Channel, StringComparison.OrdinalIgnoreCase)))
                 {
                     if (user.IsOp &&
-                        Settings.GetPrimaryChannels().Any(a => a.Equals(e.Data.Channel, StringComparison.OrdinalIgnoreCase)))
+                        Settings.GetPrimaryChannels().Any(
+                            a => a.Equals(e.Data.Channel, StringComparison.OrdinalIgnoreCase)))
                     {
                         permission = _channelOperatorPermission;
                     }
                 }
-
-                string msg = _commandHandler.ParseCommand(e.Data.Nick, permission, e.Data.Message);
-
-                if (msg != null)
-                {
-                    _irc.SendMessage(SendType.Message, e.Data.Channel, string.Format("{0}: {1}", e.Data.Nick, msg));
-                }
             }
-            catch (Exception exception)
+
+            string msg = null;
+            try
             {
-                Logger.AddErrorMessage(exception.ToString());
+                msg = _commandHandler.ParseCommand(e.Data.Nick, permission, e.Data.Message);
+            }
+            catch (Exception ex)
+            {
+                Logger.AddErrorMessage(ex.Message);
+            }
+
+            if (msg != null)
+            {
+                _irc.SendMessage(SendType.Message, e.Data.Channel, string.Format("{0}: {1}", e.Data.Nick, msg));
             }
         }
 
