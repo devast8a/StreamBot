@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using Meebey.SmartIrc4net;
 using StreamBot.IRCBot.Commands;
@@ -8,8 +9,6 @@ namespace StreamBot.IRCBot
 {
     public class Bot
     {
-        public static string Version = "1.0";
-
         private readonly IrcClient _irc;
         private readonly CommandHandler _commandHandler;
         private readonly StreamHandler _streamHandler;
@@ -30,7 +29,7 @@ namespace StreamBot.IRCBot
             _commandHandler = new CommandHandler();
             Settings = settings;
 
-            Logger.AddMessage("StreamBot Version " + Version);
+            Logger.AddMessage("StreamBot Version " + Assembly.GetCallingAssembly().GetName().Version);
 
             foreach (var stream in Settings.GetStreams())
             {
@@ -64,11 +63,15 @@ namespace StreamBot.IRCBot
                 new AddStream(_streamHandler, Settings)
                 ));
 
+            _commandHandler.Add("!version", new Respond(Assembly.GetCallingAssembly().GetName().Version.ToString()));
+
             _commandHandler.Add("!remstream", new SecureCommand(x => x.Operator,
                 new RemoveStream(_streamHandler, Settings)
                 ));
 
             _commandHandler.Add("!streaming", new Streaming(_streamHandler));
+
+            _commandHandler.Add("!update", new UpdateStream(_streamHandler));
 
             // Create a suspended stream-check timer
             _checkTimer = new Timer(StreamTimer, null,
