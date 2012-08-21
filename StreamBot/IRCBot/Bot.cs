@@ -18,7 +18,7 @@ namespace StreamBot.IRCBot
 
         private readonly Timer _checkTimer;
 
-        private SettingsInstance _settings;
+        private readonly SettingsInstance _settings;
         public Log Logger;
 
         public Bot(SettingsInstance settings)
