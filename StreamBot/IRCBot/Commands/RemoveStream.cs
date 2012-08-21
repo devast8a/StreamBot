@@ -16,7 +16,7 @@ namespace StreamBot.IRCBot.Commands
             if (args.Args.Length == 1)
             {
                 var name = args.Args[0];
-                var resp = _handler.StreamList.RemoveAll((x) => x.Name == name) > 0 ? "Deleted " + name : "No streamer exists by that name";
+                var resp = _handler.StreamList.RemoveAll(x => x.Name == name) > 0 ? "Deleted " + name : "No streamer exists by that name";
                 _settings.RemoveStream(name);
                 return resp;
             }
