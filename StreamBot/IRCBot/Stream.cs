@@ -3,16 +3,6 @@ using StreamBot.IRCBot.StreamPlugins;
 
 namespace StreamBot.IRCBot
 {
-    public enum StreamStatus
-    {
-        // Offline
-        Offline,
-        // Online now, but was offline last tick
-        NowOnline,
-        // Online now, and was online last tick
-        StillOnline,
-    }
-
     public class Stream
     {
         public string Name;
