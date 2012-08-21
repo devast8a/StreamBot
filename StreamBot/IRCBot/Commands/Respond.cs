@@ -1,6 +1,6 @@
 ﻿namespace StreamBot.IRCBot.Commands
 {
-    class Respond : ICommand
+    internal class Respond : ICommand
     {
         private readonly string _text;
 

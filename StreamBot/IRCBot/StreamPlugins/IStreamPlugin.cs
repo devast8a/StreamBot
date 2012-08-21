@@ -1,6 +1,6 @@
 ﻿namespace StreamBot.IRCBot.StreamPlugins
 {
-    public interface IStreamPlugin
+    internal interface IStreamPlugin
     {
         bool GetStatus(Stream stream);
         bool UseFor(Stream stream);

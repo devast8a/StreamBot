@@ -7,7 +7,7 @@ using StreamBot.IRCBot.Commands;
 
 namespace StreamBot.IRCBot
 {
-    public class Bot
+    internal class Bot
     {
         private readonly IrcClient _irc;
         private readonly CommandHandler _commandHandler;

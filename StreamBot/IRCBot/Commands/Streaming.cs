@@ -1,6 +1,6 @@
 ﻿namespace StreamBot.IRCBot.Commands
 {
-    class Streaming : ICommand
+    internal class Streaming : ICommand
     {
         private readonly StreamHandler _handler;
 

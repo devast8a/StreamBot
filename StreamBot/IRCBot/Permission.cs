@@ -1,6 +1,6 @@
 ﻿namespace StreamBot.IRCBot
 {
-    public class Permission
+    internal class Permission
     {
         public string Name;
 

@@ -2,7 +2,7 @@
 
 namespace StreamBot.IRCBot.Commands
 {
-    public class SecureCommand : ICommand
+    internal class SecureCommand : ICommand
     {
         private readonly ICommand _command;
         private readonly Func<Permission, bool> _filter;

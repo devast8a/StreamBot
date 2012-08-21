@@ -1,6 +1,6 @@
 namespace StreamBot.IRCBot
 {
-    public class CommandArgs
+    internal class CommandArgs
     {
         public string Name;
         public string[] Args;

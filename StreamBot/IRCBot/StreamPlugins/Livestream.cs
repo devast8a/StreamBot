@@ -3,7 +3,7 @@ using HtmlAgilityPack;
 
 namespace StreamBot.IRCBot.StreamPlugins
 {
-    public class Livestream : IStreamPlugin
+    internal class Livestream : IStreamPlugin
     {
         private readonly Regex _regex = new Regex(@"^.*livestream\.com.+$", RegexOptions.Compiled);
 

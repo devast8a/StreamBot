@@ -5,7 +5,7 @@ using StreamBot.IRCBot.StreamPlugins;
 
 namespace StreamBot.IRCBot
 {
-    public class StreamHandler
+    internal class StreamHandler
     {
         private readonly Bot _bot;
 

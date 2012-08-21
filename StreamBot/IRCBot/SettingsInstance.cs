@@ -5,13 +5,13 @@ using System.Xml.Linq;
 
 namespace StreamBot.IRCBot
 {
-    public enum PermissionType
+    internal enum PermissionType
     {
         Operator,
         SuperOperator,
     }
 
-    public class SettingsInstance
+    internal class SettingsInstance
     {
         private readonly XElement _source;
         public string Server { get; private set; }

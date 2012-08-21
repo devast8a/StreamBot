@@ -3,7 +3,7 @@ using StreamBot.IRCBot.StreamPlugins;
 
 namespace StreamBot.IRCBot
 {
-    public class Stream
+    internal class Stream
     {
         public string Name { get; private set; }
         public string Url { get; private set; }

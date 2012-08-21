@@ -3,7 +3,7 @@ using System.IO;
 
 namespace StreamBot.IRCBot
 {
-    public class Log
+    internal class Log
     {
         private readonly FileStream _file;
         private readonly TextWriter _writer;

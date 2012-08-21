@@ -1,6 +1,6 @@
 namespace StreamBot.IRCBot.Commands
 {
-    public interface ICommand
+    internal interface ICommand
     {
         string Parse(string sender, Permission permission, CommandArgs args);
     }

@@ -1,6 +1,6 @@
 namespace StreamBot.IRCBot.Commands
 {
-    public class RemoveStream : ICommand
+    internal class RemoveStream : ICommand
     {
         readonly StreamHandler _handler;
         private readonly SettingsInstance _settings;

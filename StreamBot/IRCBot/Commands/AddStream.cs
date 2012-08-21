@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace StreamBot.IRCBot.Commands
 {
-    class AddStream : ICommand
+    internal class AddStream : ICommand
     {
         readonly StreamHandler _handler;
         private readonly SettingsInstance _settings;

@@ -5,7 +5,7 @@ using System.Xml.Linq;
 
 namespace StreamBot.IRCBot.StreamPlugins
 {
-    public class Twitch : IStreamPlugin
+    internal class Twitch : IStreamPlugin
     {
         private readonly Regex _regex = new Regex(@"^.*twitch\.tv.+$", RegexOptions.Compiled);
         

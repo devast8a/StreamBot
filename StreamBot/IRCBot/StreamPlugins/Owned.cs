@@ -5,7 +5,7 @@ using System.Xml.Linq;
 
 namespace StreamBot.IRCBot.StreamPlugins
 {
-    public class Owned : IStreamPlugin
+    internal class Owned : IStreamPlugin
     {
         private readonly Regex _regex = new Regex(@"^.*own3d\.tv.+$", RegexOptions.Compiled);
 
