@@ -21,9 +21,12 @@ namespace StreamBot.IRCBot.Commands
                 return String.Format("Error - Usage {0} <hostname>", args.Name);
             }
 
-            _settings.RemoveUserPermission(args.Args[0]);
+            if (_settings.RemoveUserPermission(args.Args[0]))
+            {
+                return String.Format("Removed permissions for {0}.", args.Args[0]);
+            }
 
-            return String.Format("Removed permissions for {0}.", args.Args[0]);
+            return string.Format("{0} does not have any permissions attached", args.Args[0]);
         }
     }
 }
