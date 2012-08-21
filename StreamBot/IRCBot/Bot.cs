@@ -18,7 +18,7 @@ namespace StreamBot.IRCBot
 
         private readonly Timer _checkTimer;
 
-        public SettingsInstance Settings;
+        private SettingsInstance _settings;
         public Log Logger;
 
         public Bot(SettingsInstance settings)
@@ -27,11 +27,11 @@ namespace StreamBot.IRCBot
             _streamHandler = new StreamHandler(this);
             _irc = new IrcClient();
             _commandHandler = new CommandHandler();
-            Settings = settings;
+            _settings = settings;
 
             Logger.AddMessage("StreamBot Version " + Assembly.GetCallingAssembly().GetName().Version);
 
-            foreach (var stream in Settings.GetStreams())
+            foreach (var stream in _settings.GetStreams())
             {
                 _streamHandler.AddStream(stream.Name, stream.Url);
             }
@@ -60,13 +60,13 @@ namespace StreamBot.IRCBot
                 "http://vidyadev.com/wiki/A_guide_to_streaming"));
 
             _commandHandler.Add("!addstream", new SecureCommand(x => x.IsOperator,
-                new AddStream(_streamHandler, Settings)
+                new AddStream(_streamHandler, _settings)
                 ));
 
             _commandHandler.Add("!version", new Respond(Assembly.GetCallingAssembly().GetName().Version.ToString()));
 
             _commandHandler.Add("!remstream", new SecureCommand(x => x.IsOperator,
-                new RemoveStream(_streamHandler, Settings)
+                new RemoveStream(_streamHandler, _settings)
                 ));
 
             _commandHandler.Add("!streaming", new Streaming(_streamHandler));
@@ -88,7 +88,7 @@ namespace StreamBot.IRCBot
 
         public void Connect()
         {
-            Logger.AddMessage(string.Format("Connecting to: {0}:{1}", Settings.Server, Settings.Port));
+            Logger.AddMessage(string.Format("Connecting to: {0}:{1}", _settings.Server, _settings.Port));
             try
             {
                 _irc.Encoding = System.Text.Encoding.UTF8;
@@ -103,7 +103,7 @@ namespace StreamBot.IRCBot
                 _irc.OnError += OnError;
                 _irc.OnChannelMessage += OnChannelMessage;
 
-                _irc.Connect(Settings.Server, Settings.Port);
+                _irc.Connect(_settings.Server, _settings.Port);
             }
             catch (Exception e)
             {
@@ -115,19 +115,19 @@ namespace StreamBot.IRCBot
 
             try
             {
-                _irc.Login(Settings.Nickname, "Name");
+                _irc.Login(_settings.Nickname, "Name");
 
-                if (!String.IsNullOrWhiteSpace(Settings.Password))
+                if (!String.IsNullOrWhiteSpace(_settings.Password))
                 {
-                    _irc.SendMessage(SendType.Message, "NickServ", "identify " + Settings.Password);
+                    _irc.SendMessage(SendType.Message, "NickServ", "identify " + _settings.Password);
                 }
 
-                foreach (var channel in Settings.GetAllChannels())
+                foreach (var channel in _settings.GetAllChannels())
                 {
                     _irc.RfcJoin(channel);
                 }
 
-                _checkTimer.Change(TimeSpan.Zero, Settings.Period);
+                _checkTimer.Change(TimeSpan.Zero, _settings.Period);
 
                 _irc.Listen();
                 _irc.Disconnect();
@@ -142,7 +142,7 @@ namespace StreamBot.IRCBot
         {
             try
             {
-                foreach (var channel in Settings.GetAllChannels())
+                foreach (var channel in _settings.GetAllChannels())
                 {
                     _irc.RfcPrivmsg(channel, message);
                 }
@@ -166,7 +166,7 @@ namespace StreamBot.IRCBot
 
                 // If there is no permission record associated with this hostname
                 // then treat this user as a normal user
-                if (Settings.GetPermission(e.Data.Host) == null)
+                if (_settings.GetPermission(e.Data.Host) == null)
                 {
                     permission = _normalUserPermission;
                 }
@@ -191,7 +191,7 @@ namespace StreamBot.IRCBot
             Permission permission = _normalUserPermission;
 
             // Get the permission for this hostname
-            var hostPermission = Settings.GetPermission(e.Data.Host);
+            var hostPermission = _settings.GetPermission(e.Data.Host);
 
             // If there's a permission record for this user, he's an op
             if (hostPermission != null)
@@ -203,11 +203,11 @@ namespace StreamBot.IRCBot
             else
             {
                 // If there's no permission record, see if he's an op on a primary channel
-                if (user.IsOp && Settings.GetPrimaryChannels().Any(
+                if (user.IsOp && _settings.GetPrimaryChannels().Any(
                     a => a.Equals(e.Data.Channel, StringComparison.OrdinalIgnoreCase)))
                 {
                     if (user.IsOp &&
-                        Settings.GetPrimaryChannels().Any(
+                        _settings.GetPrimaryChannels().Any(
                             a => a.Equals(e.Data.Channel, StringComparison.OrdinalIgnoreCase)))
                     {
                         permission = _channelOperatorPermission;
