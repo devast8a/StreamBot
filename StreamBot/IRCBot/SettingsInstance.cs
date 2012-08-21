@@ -1,8 +1,6 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
-using System.IO;
-using System.Text.RegularExpressions;
+using System.Linq;
 using System.Xml.Linq;
 
 namespace StreamBot.IRCBot

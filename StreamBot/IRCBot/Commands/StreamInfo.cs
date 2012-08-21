@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace StreamBot.IRCBot.Commands
+﻿namespace StreamBot.IRCBot.Commands
 {
     public class StreamInfo : ICommand
     {

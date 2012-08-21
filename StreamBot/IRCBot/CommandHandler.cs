@@ -1,9 +1,4 @@
-using System;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Linq;
 using System.Collections.Generic;
-using Meebey.SmartIrc4net;
 using StreamBot.IRCBot.Commands;
 
 namespace StreamBot.IRCBot

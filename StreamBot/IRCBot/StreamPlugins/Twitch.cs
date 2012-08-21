@@ -1,7 +1,7 @@
 using System;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
-using System.Linq;
 
 namespace StreamBot.IRCBot.StreamPlugins
 {

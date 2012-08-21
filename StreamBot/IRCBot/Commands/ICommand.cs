@@ -1,5 +1,3 @@
-using Meebey.SmartIrc4net;
-
 namespace StreamBot.IRCBot.Commands
 {
     public interface ICommand
