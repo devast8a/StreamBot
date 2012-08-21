@@ -26,6 +26,12 @@ namespace StreamBot.IRCBot.Commands
             stream.Subject = args.Full;
 
             _handler.StreamSubjectChange(stream);
+
+            if(string.IsNullOrWhiteSpace(args.Full))
+            {
+                return "Cleared streaming subject";
+            }
+
             return null;
         }
     }

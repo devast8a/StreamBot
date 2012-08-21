@@ -32,7 +32,7 @@ namespace StreamBot.IRCBot.Commands
 
             if(!string.IsNullOrWhiteSpace(stream.Subject))
             {
-                subject = " - " + stream.Subject;
+                subject = " - Streaming: " + stream.Subject;
             }
 
             return string.Format("{0} - {1} - {2}{3}", stream.Name, stream.URL, stream.Online ? "Online" : "Offline", subject);
