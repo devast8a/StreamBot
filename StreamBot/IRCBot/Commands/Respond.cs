@@ -9,7 +9,7 @@
             _text=text;
         }
 
-        public string Parse(string sender, Permission permission, CommandArgs args)
+        public string Parse(MessageSource sender, Permission permission, CommandArgs args)
         {
             return _text;
         }

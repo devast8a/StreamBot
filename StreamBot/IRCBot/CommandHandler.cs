@@ -13,7 +13,7 @@ namespace StreamBot.IRCBot
             _commands.Add(text, command);
         }
 
-        public string ParseCommand(string sender, Permission permission, string message)
+        public string ParseCommand(MessageSource sender, Permission permission, string message)
         {
             int firstSpace = message.IndexOf(' ');
 

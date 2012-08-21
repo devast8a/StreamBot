@@ -49,8 +49,8 @@ namespace StreamBot.IRCBot
         {
             var permissions = EnsureExists("Permissions");
             permissions.Add(
-                new XElement(Enum.GetName(typeof(PermissionType), type)),
-                new XAttribute("Nickname", name));
+                new XElement(Enum.GetName(typeof(PermissionType), type),
+                new XAttribute("Hostname", name)));
         }
 
         public void RemovePermission(string host)

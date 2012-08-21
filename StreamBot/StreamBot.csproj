@@ -47,13 +47,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IRCBot\CommandArgs.cs" />
+    <Compile Include="IRCBot\Commands\AddOp.cs" />
     <Compile Include="IRCBot\Commands\AddStream.cs" />
+    <Compile Include="IRCBot\Commands\DelOp.cs" />
     <Compile Include="IRCBot\Commands\ICommand.cs" />
     <Compile Include="IRCBot\Commands\ListStreams.cs" />
     <Compile Include="IRCBot\Commands\Respond.cs" />
     <Compile Include="IRCBot\Commands\SecureCommand.cs" />
     <Compile Include="IRCBot\Commands\StreamInfo.cs" />
     <Compile Include="IRCBot\Commands\Streaming.cs" />
+    <Compile Include="IRCBot\MessageSource.cs" />
     <Compile Include="IRCBot\Permission.cs" />
     <Compile Include="IRCBot\Commands\RemoveStream.cs" />
     <Compile Include="IRCBot\StreamPlugins\IStreamPlugin.cs" />

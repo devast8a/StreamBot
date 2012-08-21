@@ -9,9 +9,9 @@
             _handler = handler;
         }
 
-        public string Parse(string sender, Permission permission, CommandArgs args)
+        public string Parse(MessageSource sender, Permission permission, CommandArgs args)
         {
-            var stream = _handler.GetStream(sender);
+            var stream = _handler.GetStream(sender.Nickname);
 
             if(stream == null)
             {

@@ -74,6 +74,9 @@ namespace StreamBot.IRCBot
 
             _commandHandler.Add("!update", new UpdateStream(_streamHandler));
 
+            _commandHandler.Add("!addop", new AddOp(_settings));
+            _commandHandler.Add("!delop", new DelOp(_settings));
+
             // Create a suspended stream-check timer
             _checkTimer = new Timer(StreamTimer, null,
                 TimeSpan.FromMilliseconds(-1),
@@ -172,7 +175,9 @@ namespace StreamBot.IRCBot
                     permission = _normalUserPermission;
                 }
 
-                string msg = _commandHandler.ParseCommand(e.Data.Nick, permission, e.Data.Message);
+                string msg = _commandHandler.ParseCommand(
+                    new MessageSource(e.Data.Host, e.Data.Nick), 
+                    permission, e.Data.Message);
 
                 if (msg != null)
                 {
@@ -219,7 +224,9 @@ namespace StreamBot.IRCBot
             string msg = null;
             try
             {
-                msg = _commandHandler.ParseCommand(e.Data.Nick, permission, e.Data.Message);
+                msg = _commandHandler.ParseCommand(
+                    new MessageSource(e.Data.Host, e.Data.Nick), 
+                    permission, e.Data.Message);
             }
             catch (Exception ex)
             {
