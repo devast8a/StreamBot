@@ -6,7 +6,7 @@ namespace StreamBot.IRCBot.Commands
     {
         private readonly ICommand _command;
         private readonly Func<MessageSource, bool> _filter;
-        public string ErrorText;
+        public string ErrorText = "You do not have permission to use this command.";
 
         public SecureCommand(Func<MessageSource, bool> filter, ICommand command)
         {
