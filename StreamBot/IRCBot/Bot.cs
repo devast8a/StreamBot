@@ -89,7 +89,7 @@ namespace StreamBot.IRCBot
 
         public void Connect()
         {
-            Logger.Info(string.Format("Connecting to: {0}:{1}", _settings.Server, _settings.Port));
+            Logger.InfoFormat("Connecting to: {0}:{1}", _settings.Server, _settings.Port);
             try
             {
                 _irc.Encoding = System.Text.Encoding.UTF8;

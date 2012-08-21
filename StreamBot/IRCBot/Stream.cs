@@ -54,7 +54,7 @@ namespace StreamBot.IRCBot
                 }
                 Online = false;
 
-                Logger.Error(string.Format("While processing stream {0}({1})\n{2}", Name, Url, e));
+                Logger.ErrorFormat("While processing stream {0}({1})\n{2}", Name, Url, e);
             }
         }
     }

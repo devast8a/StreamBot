@@ -55,12 +55,12 @@ namespace StreamBot.IRCBot
 
         public void UpdateStreams()
         {
-            Logger.Info(string.Format("Checking {0} streams.", _streams.Count));
+            Logger.InfoFormat("Checking {0} streams.", _streams.Count);
 
             foreach (var stream in _streams)
             {
                 stream.Update(this);
-                Logger.Info(string.Format("Checked {0} - {1}", stream.Name, stream.Online ? "Online" : "Offline"));
+                Logger.InfoFormat("Checked {0} - {1}", stream.Name, stream.Online ? "Online" : "Offline");
             }
 
             Logger.Info("Stream checking done.");
