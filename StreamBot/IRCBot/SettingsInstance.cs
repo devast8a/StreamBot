@@ -94,11 +94,10 @@ namespace StreamBot.IRCBot
         public IEnumerable<Stream> GetStreams()
         {
             var streams = EnsureExists("Streams");
-            return streams.Elements("Streamer").Select(streamer => new Stream
-            {
-                Name = (string)streamer.Attribute("Nickname"),
-                URL = (string)streamer.Attribute("Location"),
-            });
+            return streams.Elements("Streamer").Select(
+                streamer => new Stream(
+                                (string)streamer.Attribute("Nickname"),
+                                (string)streamer.Attribute("Location")));
         }
 
         public void AddStream(string nickname, string location)

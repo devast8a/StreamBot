@@ -5,11 +5,17 @@ namespace StreamBot.IRCBot
 {
     public class Stream
     {
-        public string Name;
-        public string URL;
-        public string Subject;
-        public bool Online;
-        public IStreamPlugin Plugin;
+        public string Name { get; private set; }
+        public string URL { get; private set; }
+        public string Subject { get; set; }
+        public bool Online { get; set; }
+        public IStreamPlugin Plugin { get; set; }
+
+        public Stream(string name, string url)
+        {
+            Name = name;
+            URL = url;
+        }
 
         public void Update(StreamHandler handler)
         {
