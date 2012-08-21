@@ -16,15 +16,15 @@ namespace StreamBot.IRCBot.Commands
             _settings = settings;
         }
 
-        public string Parse(string sender, Permission permission, string[] arguments)
+        public string Parse(string sender, Permission permission, CommandArgs args)
         {
-            if(arguments.Length != 3)
+            if(args.Args.Length != 2)
             {
-                return "Error - Usage !addstream <stream-name> <stream-url>";
+                return String.Format("Error - Usage {0} <stream-name> <stream-url>", args.Name);
             }
 
-            var name = arguments[1];
-            var url = arguments[2];
+            var name = args.Args[0];
+            var url = args.Args[1];
 
             _handler.Logger.AddMessage(string.Format("{0} is adding a new stream. {1} - {2}", sender, name, url));
 

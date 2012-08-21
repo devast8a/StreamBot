@@ -14,7 +14,7 @@ namespace StreamBot.IRCBot.Commands
             _text=text;
         }
 
-        public string Parse(string sender, Permission permission, string[] arguments)
+        public string Parse(string sender, Permission permission, CommandArgs args)
         {
             return _text;
         }

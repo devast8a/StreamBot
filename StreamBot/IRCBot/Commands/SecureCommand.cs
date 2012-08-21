@@ -17,11 +17,11 @@ namespace StreamBot.IRCBot.Commands
             _command = command;
         }
 
-        public string Parse(string sender, Permission permission, string[] arguments)
+        public string Parse(string sender, Permission permission, CommandArgs args)
         {
             if(_filter(permission))
             {
-                return _command.Parse(sender, permission, arguments);
+                return _command.Parse(sender, permission, args);
             }
 
             return ErrorText;

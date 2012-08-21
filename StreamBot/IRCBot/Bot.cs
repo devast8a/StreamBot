@@ -68,6 +68,8 @@ namespace StreamBot.IRCBot
                 new RemoveStream(_streamHandler, Settings)
                 ));
 
+            _commandHandler.Add("!streaming", new Streaming(_streamHandler));
+
             // Create a suspended stream-check timer
             _checkTimer = new Timer(StreamTimer, null,
                 TimeSpan.FromMilliseconds(-1),

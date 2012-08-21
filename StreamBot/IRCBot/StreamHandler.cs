@@ -77,6 +77,16 @@ namespace StreamBot.IRCBot
         {
             return StreamList.FirstOrDefault(x => x.Name.Equals(streamName, StringComparison.OrdinalIgnoreCase));
         }
+
+        public void StreamSubjectChange(Stream stream)
+        {
+            if(string.IsNullOrWhiteSpace(stream.Subject))
+            {
+                return;
+            }
+
+            _bot.SendMessage(string.Format("{0} - {1} - Is now streaming {2}", stream.Name, stream.URL, stream.Subject));
+        }
     }
 }
 

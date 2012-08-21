@@ -20,7 +20,7 @@ namespace StreamBot.IRCBot.Commands
             _predicate=predicate;
         }
 
-        public string Parse(string sender, Permission permission, string[] arguments)
+        public string Parse(string sender, Permission permission, CommandArgs args)
         {
             var ret = string.Join(", ", _handler.StreamList.Where(_predicate).Select(x => x.Name));
 

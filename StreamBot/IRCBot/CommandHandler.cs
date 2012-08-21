@@ -19,13 +19,26 @@ namespace StreamBot.IRCBot
  
         public string ParseCommand(string sender, Permission permission, string message)
         {
-            var split = message.Split(' ');
+            int firstSpace = message.IndexOf(' ');
+
+            var args = new CommandArgs();
+
+            if(firstSpace == -1){
+                args.Name = message;
+                args.Full = "";
+                args.Args = new string[0];
+            }else
+            {
+                args.Name = message.Substring(0, firstSpace);
+                args.Full = message.Substring(firstSpace + 1).Trim();
+                args.Args = args.Full.Split(' ');
+            }
 
             ICommand command;
 
-            if(_commands.TryGetValue(split[0], out command))
+            if(_commands.TryGetValue(args.Name, out command))
             {
-                return command.Parse(sender, permission, split);
+                return command.Parse(sender, permission, args);
             }
 
             return null;
