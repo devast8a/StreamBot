@@ -53,6 +53,24 @@ namespace StreamBot.IRCBot
                 new XAttribute("Nickname", name));
         }
 
+        public void RemovePermission(string host)
+        {
+            var permissions = EnsureExists("Permissions");
+
+            foreach (var type in Enum.GetValues(typeof(PermissionType)))
+            {
+                var target = permissions.Elements(
+                    Enum.GetName(typeof(PermissionType), type))
+                    .FirstOrDefault(
+                        a => ((string)a.Attribute("Hostname")).Equals(host, StringComparison.OrdinalIgnoreCase));
+                if (target != null)
+                {
+                    target.Remove();
+                    return;
+                }
+            }
+        }
+
         public PermissionType? GetPermission(string host)
         {
             var permissions = EnsureExists("Permissions");
