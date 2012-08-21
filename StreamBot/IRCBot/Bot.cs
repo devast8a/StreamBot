@@ -15,6 +15,8 @@ namespace StreamBot.IRCBot
         private readonly Permission _channelOperatorPermission;
         private readonly Permission _normalUserPermission;
 
+        private readonly Timer _checkTimer;
+
         public SettingsInstance Settings;
         public Log Logger;
 
@@ -62,6 +64,11 @@ namespace StreamBot.IRCBot
                 new RemoveStream(_streamHandler, Settings)
                 ));
 
+            // Create a suspended stream-check timer
+            _checkTimer = new Timer(StreamTimer, null,
+                TimeSpan.FromMilliseconds(-1),
+                TimeSpan.FromMilliseconds(-1));
+
             // Setup permissions
             _channelOperatorPermission = new Permission() {Operator = true};
             _normalUserPermission = new Permission();
@@ -106,7 +113,7 @@ namespace StreamBot.IRCBot
                     _irc.RfcJoin(channel);
                 }
 
-                new Timer(StreamTimer, null, TimeSpan.Zero, Settings.Period);
+                _checkTimer.Change(TimeSpan.Zero, Settings.Period);
 
                 _irc.Listen();
                 _irc.Disconnect();
