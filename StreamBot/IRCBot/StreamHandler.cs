@@ -56,8 +56,8 @@ namespace StreamBot.IRCBot
 
             foreach (var stream in StreamList)
             {
-                Logger.AddMessage(string.Format("Checking {0}", stream.Name));
                 stream.Update(this);
+                Logger.AddMessage(string.Format("Checked {0} - {1}", stream.Name, stream.Online ? "Online" : "Offline"));
             }
 
             Logger.AddMessage("Stream checking done.");
