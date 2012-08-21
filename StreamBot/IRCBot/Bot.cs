@@ -184,7 +184,7 @@ namespace StreamBot.IRCBot
             // Get the permission for this hostname
             var permission = _settings.GetUserPermission(e.Data.Host);
 
-            if (permission != null && !string.IsNullOrWhiteSpace(e.Data.Channel))
+            if (permission == null && !string.IsNullOrWhiteSpace(e.Data.Channel))
             {
                 var user = _irc.GetChannelUser(e.Data.Channel, e.Data.Nick);
                 // If there's no permission record, see if he's an op on a primary channel
