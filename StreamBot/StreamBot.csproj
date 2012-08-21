@@ -54,6 +54,7 @@
     <Compile Include="IRCBot\Permission.cs" />
     <Compile Include="IRCBot\Commands\RemoveStream.cs" />
     <Compile Include="IRCBot\StreamPlugins\IStreamPlugin.cs" />
+    <Compile Include="IRCBot\Commands\UpdateStream.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="IRCBot\Bot.cs" />
