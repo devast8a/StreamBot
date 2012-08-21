@@ -11,13 +11,13 @@ namespace StreamBot
 
         private static void SaveSettings(object state)
         {
-            SettingsFile settings = (SettingsFile)state;
+            var settings = (SettingsFile)state;
             settings.Save();
         }
 
         public static void Main(string[] args)
         {
-            SettingsFile settings = new SettingsFile("Settings.xml");
+            var settings = new SettingsFile("Settings.xml");
 
             Console.WriteLine("Press <ENTER> to quit.");
 
