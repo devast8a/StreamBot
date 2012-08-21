@@ -119,7 +119,7 @@ namespace StreamBot.IRCBot
 
                 if (!String.IsNullOrWhiteSpace(_settings.Password))
                 {
-                    _irc.SendMessage(SendType.Message, "NickServ", "identify " + _settings.Password);
+                    _irc.RfcPrivmsg("NickServ", "identify " + _settings.Password);
                 }
 
                 foreach (var channel in _settings.GetAllChannels())
@@ -227,7 +227,7 @@ namespace StreamBot.IRCBot
 
             if (msg != null)
             {
-                _irc.SendMessage(SendType.Message, e.Data.Channel, string.Format("{0}: {1}", e.Data.Nick, msg));
+                _irc.RfcPrivmsg(e.Data.Channel, string.Format("{0}: {1}", e.Data.Nick, msg));
             }
         }
 
