@@ -79,7 +79,7 @@ namespace StreamBot.IRCBot
                 TimeSpan.FromMilliseconds(-1));
 
             // Setup permissions
-            _channelOperatorPermission = new Permission() {Operator = true};
+            _channelOperatorPermission = new Permission {Operator = true};
             _normalUserPermission = new Permission();
 
             Logger.AddMessage("Bot loaded, ready to connect.");
