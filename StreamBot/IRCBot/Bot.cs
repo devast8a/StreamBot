@@ -166,13 +166,22 @@ namespace StreamBot.IRCBot
             var user = _irc.GetChannelUser(e.Data.Channel, e.Data.Nick);
 
             Permission permission = _normalUserPermission;
-            
-            // If there is no permission record associated with this hostname
-            // see if he's an op on a primary channel
-            if (Settings.GetPermission(e.Data.Host) != null)
+
+            // Get the permission for this hostname
+            var hostPermission = Settings.GetPermission(e.Data.Host);
+
+            // If there's a permission record for this user, he's an op
+            if (hostPermission != null)
             {
-                if (user.IsOp &&
-                    Settings.GetPrimaryChannels().Any(a => a.Equals(e.Data.Channel, StringComparison.OrdinalIgnoreCase)))
+                // TODO: In the future we may need to distinguish between super op/channel op
+                // hostPermission.Value has this information but it is not currently used.
+                permission = _channelOperatorPermission;
+            }
+            else
+            {
+                // If there's no permission record, see if he's an op on a primary channel
+                if (user.IsOp && Settings.GetPrimaryChannels().Any(
+                    a => a.Equals(e.Data.Channel, StringComparison.OrdinalIgnoreCase)))
                 {
                     permission = _channelOperatorPermission;
                 }
