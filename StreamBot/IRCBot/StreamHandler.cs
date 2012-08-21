@@ -33,11 +33,8 @@ namespace StreamBot.IRCBot
 
         public bool AddStream(string name, string url)
         {
-            var stream = new Stream();
+            var stream = new Stream {Name = name, URL = url};
 
-            stream.Name = name;
-            stream.URL = url;
-            
             stream.Plugin = _streamPlugins.FirstOrDefault(x => x.UseFor(stream));
 
             StreamList.Add(stream);
