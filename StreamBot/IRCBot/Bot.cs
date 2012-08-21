@@ -142,14 +142,9 @@ namespace StreamBot.IRCBot
         {
             try
             {
-                foreach (var channel in Settings.GetPrimaryChannels())
+                foreach (var channel in Settings.GetAllChannels())
                 {
-                    _irc.SendMessage(SendType.Message, channel, message);
-                }
-
-                foreach (var channel in Settings.GetSecondaryChannels())
-                {
-                    _irc.SendMessage(SendType.Message, channel, message);
+                    _irc.RfcPrivmsg(channel, message);
                 }
             }
             catch (Exception exception)
