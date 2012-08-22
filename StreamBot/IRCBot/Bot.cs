@@ -12,7 +12,7 @@ namespace StreamBot.IRCBot
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(Bot));
 
-        private readonly IrcClient _irc;
+        private IrcClient _irc;
         private readonly CommandHandler _commandHandler;
         private readonly StreamHandler _streamHandler;
 
@@ -23,7 +23,6 @@ namespace StreamBot.IRCBot
         public Bot(SettingsInstance settings)
         {
             _streamHandler = new StreamHandler(this);
-            _irc = new IrcClient();
             _commandHandler = new CommandHandler();
             _settings = settings;
 
@@ -90,53 +89,78 @@ namespace StreamBot.IRCBot
 
         public void Connect()
         {
-            Logger.InfoFormat("Connecting to: {0}:{1}", _settings.Server, _settings.Port);
-            try
+            while (true)
             {
-                _irc.Encoding = System.Text.Encoding.UTF8;
-                _irc.SendDelay = 500;
-                _irc.ActiveChannelSyncing = true;
-                _irc.AutoReconnect = true;
-                _irc.AutoRejoinOnKick = true;
-                _irc.AutoRetry = true;
-                _irc.AutoRetryDelay = 10000;
+                _irc = new IrcClient();
 
-                _irc.OnQueryMessage += OnQueryMessage;
-                _irc.OnError += OnError;
-                _irc.OnChannelMessage += OnChannelMessage;
-
-                _irc.Connect(_settings.Server, _settings.Port);
-            }
-            catch (Exception e)
-            {
-                // Log this shit
-                Logger.Error(e.ToString());
-            }
-
-            Logger.Info("Connected! Joining channels");
-
-            try
-            {
-                _irc.Login(_settings.Nickname, "Name");
-
-                if (!String.IsNullOrWhiteSpace(_settings.Password))
+                Logger.InfoFormat("Connecting to: {0}:{1}", _settings.Server, _settings.Port);
+                try
                 {
-                    _irc.RfcPrivmsg("NickServ", "identify " + _settings.Password);
+                    _irc.Encoding = System.Text.Encoding.UTF8;
+                    _irc.SendDelay = 500;
+                    _irc.ActiveChannelSyncing = true;
+                    _irc.AutoReconnect = false;
+                    _irc.AutoRejoinOnKick = true;
+                    _irc.AutoRetry = true;
+                    _irc.AutoRetryDelay = 10000;
+
+                    _irc.OnQueryMessage += OnQueryMessage;
+                    _irc.OnError += OnError;
+                    _irc.OnChannelMessage += OnChannelMessage;
+                    _irc.OnRawMessage += (x, e) => Logger.Info(e.Data.RawMessage);
+
+                    _irc.Connect(_settings.Server, _settings.Port);
+                }
+                catch (Exception e)
+                {
+                    // Log this shit
+                    Logger.Error(e.ToString());
                 }
 
-                foreach (var channel in _settings.GetAllChannels())
+                Logger.Info("Connected! Joining channels");
+
+                try
                 {
-                    _irc.RfcJoin(channel);
+                    _irc.Login(_settings.Nickname, "Name");
+
+                    if (!String.IsNullOrWhiteSpace(_settings.Password))
+                    {
+                        if (_irc.Nickname != _settings.Nickname)
+                        {
+                            _irc.RfcPrivmsg("NickServ", "GHOST " + _settings.Nickname + " " + _settings.Password);
+                            _irc.RfcNick(_settings.Nickname);
+                        }
+
+                        _irc.RfcPrivmsg("NickServ", "identify " + _settings.Password);
+                    }
+
+                    foreach (var channel in _settings.GetAllChannels())
+                    {
+                        _irc.RfcJoin(channel);
+                    }
+
+                    _checkTimer.Change(TimeSpan.Zero, _settings.Period);
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e.ToString());
                 }
 
-                _checkTimer.Change(TimeSpan.Zero, _settings.Period);
+                try
+                {
+                    _irc.Listen();
+                    Logger.Error("Lost connection to IRC (Automatically reconnecting in 10 seconds)");
+                    Thread.Sleep(10000);
 
-                _irc.Listen();
-                _irc.Disconnect();
-            }
-            catch (Exception e)
-            {
-                Logger.Error(e.ToString());
+                    if (_irc.IsConnected)
+                    {
+                        _irc.Disconnect();
+                    }
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e.ToString());
+                }
             }
         }
 
