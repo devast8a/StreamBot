@@ -107,7 +107,7 @@ namespace StreamBot.IRCBot
                     _irc.OnQueryMessage += OnQueryMessage;
                     _irc.OnError += OnError;
                     _irc.OnChannelMessage += OnChannelMessage;
-                    _irc.OnRawMessage += (x, e) => Logger.Info(e.Data.RawMessage);
+                    //_irc.OnRawMessage += (x, e) => Logger.Info(e.Data.RawMessage);
 
                     _irc.Connect(_settings.Server, _settings.Port);
                 }
