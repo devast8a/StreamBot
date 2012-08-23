@@ -105,6 +105,7 @@ namespace StreamBot.IRCBot
                     _irc.AutoRetryDelay = 10000;
 
                     _irc.OnQueryMessage += OnQueryMessage;
+                    _irc.OnQueryNotice += OnQueryMessage;
                     _irc.OnError += OnError;
                     _irc.OnChannelMessage += OnChannelMessage;
                     //_irc.OnRawMessage += (x, e) => Logger.Info(e.Data.RawMessage);
@@ -125,12 +126,6 @@ namespace StreamBot.IRCBot
 
                     if (!String.IsNullOrWhiteSpace(_settings.Password))
                     {
-                        if (_irc.Nickname != _settings.Nickname)
-                        {
-                            _irc.RfcPrivmsg("NickServ", "GHOST " + _settings.Nickname + " " + _settings.Password);
-                            _irc.RfcNick(_settings.Nickname);
-                        }
-
                         _irc.RfcPrivmsg("NickServ", "identify " + _settings.Password);
                     }
 
@@ -188,13 +183,25 @@ namespace StreamBot.IRCBot
         {
             try
             {
+                if (e.Data.Nick == "NickServ" && e.Data.Message.StartsWith("This nickname is registered."))
+                {
+                    _irc.RfcPrivmsg("NickServ", "identify " + _settings.Password);
+                    return;
+                }
+
                 string msg = _commandHandler.ParseCommand(
                     () => GetMessageSource(e),
                     e.Data.Message);
 
                 if (msg != null)
                 {
-                    _irc.SendMessage(SendType.Message, e.Data.Nick, msg);
+
+                    if(e.Data.Type == ReceiveType.QueryNotice){
+                        _irc.RfcNotice(e.Data.Nick, msg);
+                    }else
+                    {
+                        _irc.RfcPrivmsg(e.Data.Nick, msg);
+                    }
                 }
             }
             catch (Exception exception)
@@ -252,6 +259,12 @@ namespace StreamBot.IRCBot
         {
             try
             {
+                if (_irc.Nickname != _settings.Nickname)
+                {
+                    _irc.RfcPrivmsg("NickServ", "GHOST " + _settings.Nickname + " " + _settings.Password);
+                    _irc.RfcNick(_settings.Nickname);
+                }
+
                 _streamHandler.UpdateStreams();
             }
             catch (Exception exception)
