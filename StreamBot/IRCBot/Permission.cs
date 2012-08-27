@@ -4,13 +4,13 @@ namespace StreamBot.IRCBot
 {
     internal class Permission
     {
-        public string Name { get; private set; }
+        public string PermissionName { get; private set; }
         public bool IsOperator { get; private set; }
         public bool IsSuperOperator { get; private set; }
 
         public Permission(string name, bool op, bool superop)
         {
-            Name = name;
+            PermissionName = name;
             IsOperator = op;
             IsSuperOperator = superop;
         }
@@ -19,7 +19,7 @@ namespace StreamBot.IRCBot
 
         static void AddPermission(Permission permission)
         {
-            Permissions.Add(permission.Name, permission);
+            Permissions.Add(permission.PermissionName, permission);
         }
 
         public static Permission GetPermission(string name)
