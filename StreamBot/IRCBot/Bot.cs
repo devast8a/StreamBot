@@ -269,6 +269,25 @@ namespace StreamBot.IRCBot
                 }
 
                 _streamHandler.UpdateStreams();
+
+                var topic = string.Join(", ", _streamHandler.Matching(x => x.Online).Select(x => x.Name));
+
+                if(string.IsNullOrWhiteSpace(topic))
+                {
+                    topic = "No streamers are currently online";
+                }
+                else
+                {
+                    topic = "[LIVE] " + topic; 
+                }
+
+                foreach (var channel in _settings.GetPrimaryChannels())
+                {
+                    if (_irc.GetChannel(channel).Topic != topic)
+                    {
+                        _irc.RfcTopic(channel, topic);
+                    }
+                }
             }
             catch (Exception exception)
             {
