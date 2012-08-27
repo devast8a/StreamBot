@@ -27,7 +27,7 @@ namespace StreamBot.IRCBot
         public void AddUserPermission(string name, Permission type)
         {
             var permissions = EnsureExists("Permissions");
-            var elem = new XElement(type.Name);
+            var elem = new XElement(type.PermissionName);
             permissions.Add(elem);
             elem.Add(new XAttribute("Hostname", name));
         }
@@ -113,6 +113,44 @@ namespace StreamBot.IRCBot
         private XElement EnsureExists(string section)
         {
             return _source.Element(section) ?? new XElement(section);
+        }
+
+        public IEnumerable<MessageSource> GetPermissions()
+        {
+            var permissions = EnsureExists("Permissions");
+
+            return permissions.Elements().
+                Select( x =>
+                    new MessageSource(
+                        (string)x.Attribute("Hostname"),
+                        (string)x.Attribute("Nickname"),
+                        Permission.GetPermission(x.Name.LocalName)
+                    )
+                );
+        }
+
+        public bool SetUserPermissionNick(string hostname, string nick)
+        {
+            var permissions = EnsureExists("Permissions");
+
+            var target =
+                permissions.Elements().FirstOrDefault(a => ((string)a.Attribute("Hostname")).Equals(hostname, StringComparison.OrdinalIgnoreCase));
+
+            if (target != null)
+            {
+                var res = target.Attribute("Nickname");
+            
+                if(res != null)
+                {
+                    res.Remove();
+                }
+                
+                target.Add(new XAttribute("Nickname", nick));
+
+                return true;
+            }
+
+            return false;
         }
     }
 }
