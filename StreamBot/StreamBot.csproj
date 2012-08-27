@@ -49,6 +49,7 @@
     <Compile Include="IRCBot\CommandArgs.cs" />
     <Compile Include="IRCBot\Commands\AddPerm.cs" />
     <Compile Include="IRCBot\Commands\AddStream.cs" />
+    <Compile Include="IRCBot\Commands\ListPerms.cs" />
     <Compile Include="IRCBot\Commands\DelPerm.cs" />
     <Compile Include="IRCBot\Commands\ICommand.cs" />
     <Compile Include="IRCBot\Commands\ListStreams.cs" />
@@ -59,6 +60,7 @@
     <Compile Include="IRCBot\MessageSource.cs" />
     <Compile Include="IRCBot\Commands\DelStream.cs" />
     <Compile Include="IRCBot\Permission.cs" />
+    <Compile Include="IRCBot\Commands\SetPermNick.cs" />
     <Compile Include="IRCBot\StreamPlugins\IStreamPlugin.cs" />
     <Compile Include="IRCBot\Commands\UpdateStream.cs" />
     <Compile Include="Main.cs" />

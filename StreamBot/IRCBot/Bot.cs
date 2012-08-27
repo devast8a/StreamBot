@@ -78,6 +78,9 @@ namespace StreamBot.IRCBot
                 new DelPerm(_settings)
                 ));
 
+            _commandHandler.Add("!operators", new ListPerms(_settings, x => x.Permission.IsOperator));
+            _commandHandler.Add("!setpermnick", new SetPermNick(_settings));
+
             // Create a suspended stream-check timer
             _checkTimer = new Timer(StreamTimer, null,
                 TimeSpan.FromMilliseconds(-1),
